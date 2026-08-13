@@ -1,0 +1,2139 @@
+{
+  "weak-scaling-2026-BASE24-container2": {
+    "1": {
+      "model": "poisson-scaling",
+      "nprocs": 1,
+      "rel_norm": 1.0,
+      "res": 24,
+      "scaling": "Weak"
+    },
+    "1000": {
+      "model": "poisson-scaling",
+      "nprocs": 1000,
+      "rel_norm": 1.0,
+      "res": 240,
+      "scaling": "Weak"
+    },
+    "125": {
+      "model": "poisson-scaling",
+      "nprocs": 125,
+      "rel_norm": 1.0,
+      "res": 120,
+      "scaling": "Weak"
+    },
+    "2197": {
+      "model": "poisson-scaling",
+      "nprocs": 2197,
+      "rel_norm": 1.0,
+      "res": 312,
+      "scaling": "Weak"
+    },
+    "27": {
+      "model": "poisson-scaling",
+      "nprocs": 27,
+      "rel_norm": 1.0,
+      "res": 72,
+      "scaling": "Weak"
+    },
+    "343": {
+      "model": "poisson-scaling",
+      "nprocs": 343,
+      "rel_norm": 1.0,
+      "res": 168,
+      "scaling": "Weak"
+    },
+    "64": {
+      "model": "poisson-scaling",
+      "nprocs": 64,
+      "rel_norm": 1.0,
+      "res": 96,
+      "scaling": "Weak"
+    },
+    "8": {
+      "model": "poisson-scaling",
+      "nprocs": 8,
+      "rel_norm": 1.0,
+      "res": 48,
+      "scaling": "Weak"
+    }
+  },
+  "weak-scaling-2026-advdiff-BASE24": {
+    "1": {
+      "dt": 0.020833333333333332,
+      "effective_options": {
+        "ksp_atol": "1e-50",
+        "ksp_max_it": "10",
+        "ksp_rtol": "1e-50",
+        "pc_type": "gamg",
+        "snes_atol": "1e-50",
+        "snes_ksp_ew": null,
+        "snes_max_it": "10",
+        "snes_rtol": "1e-50"
+      },
+      "max_drift_from_initial": 1.2244845510575867e-16,
+      "model": "advdiff-scaling",
+      "monotone_mode": null,
+      "n_steady_steps": 10,
+      "nprocs": 1,
+      "placement": {
+        "n_nodes": 1,
+        "ranks_per_node_max": 1,
+        "ranks_per_node_min": 1
+      },
+      "res": 24,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 10,
+          "ksp_its_total": 10,
+          "ksp_reason": "DIVERGED_MAX_IT",
+          "ksp_rnorm_final": 0.01928643570210293,
+          "snes_fnorm_final": 0.05375623846287562,
+          "snes_its": 0,
+          "snes_reason": "DIVERGED_LINEAR_SOLVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 10,
+          "ksp_its_total": 0,
+          "ksp_reason": "DIVERGED_MAX_IT",
+          "ksp_rnorm_final": 0.019254966592348585,
+          "n_timesteps": 10,
+          "snes_fnorm_final": 0.05375623846287524,
+          "snes_its": 0,
+          "snes_reason": "DIVERGED_LINEAR_SOLVE"
+        }
+      },
+      "theta": 1.0,
+      "tol": 1e-50
+    },
+    "1000": {
+      "dt": 0.0020833333333333333,
+      "effective_options": {
+        "ksp_atol": "1e-50",
+        "ksp_max_it": "10",
+        "ksp_rtol": "1e-50",
+        "pc_type": "gamg",
+        "snes_atol": "1e-50",
+        "snes_ksp_ew": null,
+        "snes_max_it": "10",
+        "snes_rtol": "1e-50"
+      },
+      "max_drift_from_initial": 1.2246399186922782e-16,
+      "model": "advdiff-scaling",
+      "monotone_mode": null,
+      "n_steady_steps": 10,
+      "nprocs": 1000,
+      "placement": {
+        "n_nodes": 21,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 40
+      },
+      "res": 240,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 10,
+          "ksp_its_total": 10,
+          "ksp_reason": "DIVERGED_MAX_IT",
+          "ksp_rnorm_final": 0.07379700668590419,
+          "snes_fnorm_final": 0.00170867740756197,
+          "snes_its": 0,
+          "snes_reason": "DIVERGED_LINEAR_SOLVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 10,
+          "ksp_its_total": 0,
+          "ksp_reason": "DIVERGED_MAX_IT",
+          "ksp_rnorm_final": 0.07354214724360414,
+          "n_timesteps": 10,
+          "snes_fnorm_final": 0.0017086774075619642,
+          "snes_its": 0,
+          "snes_reason": "DIVERGED_LINEAR_SOLVE"
+        }
+      },
+      "theta": 1.0,
+      "tol": 1e-50
+    },
+    "125": {
+      "dt": 0.004166666666666667,
+      "effective_options": {
+        "ksp_atol": "1e-50",
+        "ksp_max_it": "10",
+        "ksp_rtol": "1e-50",
+        "pc_type": "gamg",
+        "snes_atol": "1e-50",
+        "snes_ksp_ew": null,
+        "snes_max_it": "10",
+        "snes_rtol": "1e-50"
+      },
+      "max_drift_from_initial": 1.2246217625329842e-16,
+      "model": "advdiff-scaling",
+      "monotone_mode": null,
+      "n_steady_steps": 10,
+      "nprocs": 125,
+      "placement": {
+        "n_nodes": 3,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 29
+      },
+      "res": 120,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 10,
+          "ksp_its_total": 10,
+          "ksp_reason": "DIVERGED_MAX_IT",
+          "ksp_rnorm_final": 0.05755309124801012,
+          "snes_fnorm_final": 0.004831555963772385,
+          "snes_its": 0,
+          "snes_reason": "DIVERGED_LINEAR_SOLVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 10,
+          "ksp_its_total": 0,
+          "ksp_reason": "DIVERGED_MAX_IT",
+          "ksp_rnorm_final": 0.058562758623791226,
+          "n_timesteps": 10,
+          "snes_fnorm_final": 0.00483155596377233,
+          "snes_its": 0,
+          "snes_reason": "DIVERGED_LINEAR_SOLVE"
+        }
+      },
+      "theta": 1.0,
+      "tol": 1e-50
+    },
+    "27": {
+      "dt": 0.006944444444444444,
+      "effective_options": {
+        "ksp_atol": "1e-50",
+        "ksp_max_it": "10",
+        "ksp_rtol": "1e-50",
+        "pc_type": "gamg",
+        "snes_atol": "1e-50",
+        "snes_ksp_ew": null,
+        "snes_max_it": "10",
+        "snes_rtol": "1e-50"
+      },
+      "max_drift_from_initial": 1.2245697498262189e-16,
+      "model": "advdiff-scaling",
+      "monotone_mode": null,
+      "n_steady_steps": 10,
+      "nprocs": 27,
+      "placement": {
+        "n_nodes": 1,
+        "ranks_per_node_max": 27,
+        "ranks_per_node_min": 27
+      },
+      "res": 72,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 10,
+          "ksp_its_total": 10,
+          "ksp_reason": "DIVERGED_MAX_IT",
+          "ksp_rnorm_final": 0.05539791766204014,
+          "snes_fnorm_final": 0.010388296732263436,
+          "snes_its": 0,
+          "snes_reason": "DIVERGED_LINEAR_SOLVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 10,
+          "ksp_its_total": 0,
+          "ksp_reason": "DIVERGED_MAX_IT",
+          "ksp_rnorm_final": 0.0595505958505641,
+          "n_timesteps": 10,
+          "snes_fnorm_final": 0.010388296732264178,
+          "snes_its": 0,
+          "snes_reason": "DIVERGED_LINEAR_SOLVE"
+        }
+      },
+      "theta": 1.0,
+      "tol": 1e-50
+    },
+    "343": {
+      "dt": 0.002976190476190476,
+      "effective_options": {
+        "ksp_atol": "1e-50",
+        "ksp_max_it": "10",
+        "ksp_rtol": "1e-50",
+        "pc_type": "gamg",
+        "snes_atol": "1e-50",
+        "snes_ksp_ew": null,
+        "snes_max_it": "10",
+        "snes_rtol": "1e-50"
+      },
+      "max_drift_from_initial": 1.2246467948801548e-16,
+      "model": "advdiff-scaling",
+      "monotone_mode": null,
+      "n_steady_steps": 10,
+      "nprocs": 343,
+      "placement": {
+        "n_nodes": 8,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 7
+      },
+      "res": 168,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 10,
+          "ksp_its_total": 10,
+          "ksp_reason": "DIVERGED_MAX_IT",
+          "ksp_rnorm_final": 0.05461119150801745,
+          "snes_fnorm_final": 0.002916755596230862,
+          "snes_its": 0,
+          "snes_reason": "DIVERGED_LINEAR_SOLVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 10,
+          "ksp_its_total": 0,
+          "ksp_reason": "DIVERGED_MAX_IT",
+          "ksp_rnorm_final": 0.05453224993338999,
+          "n_timesteps": 10,
+          "snes_fnorm_final": 0.0029167555962308703,
+          "snes_its": 0,
+          "snes_reason": "DIVERGED_LINEAR_SOLVE"
+        }
+      },
+      "theta": 1.0,
+      "tol": 1e-50
+    },
+    "64": {
+      "dt": 0.005208333333333333,
+      "effective_options": {
+        "ksp_atol": "1e-50",
+        "ksp_max_it": "10",
+        "ksp_rtol": "1e-50",
+        "pc_type": "gamg",
+        "snes_atol": "1e-50",
+        "snes_ksp_ew": null,
+        "snes_max_it": "10",
+        "snes_rtol": "1e-50"
+      },
+      "max_drift_from_initial": 1.2246030946411909e-16,
+      "model": "advdiff-scaling",
+      "monotone_mode": null,
+      "n_steady_steps": 10,
+      "nprocs": 64,
+      "placement": {
+        "n_nodes": 2,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 16
+      },
+      "res": 96,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 10,
+          "ksp_its_total": 10,
+          "ksp_reason": "DIVERGED_MAX_IT",
+          "ksp_rnorm_final": 0.06149009756973583,
+          "snes_fnorm_final": 0.006752100972361069,
+          "snes_its": 0,
+          "snes_reason": "DIVERGED_LINEAR_SOLVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 10,
+          "ksp_its_total": 0,
+          "ksp_reason": "DIVERGED_MAX_IT",
+          "ksp_rnorm_final": 0.06156750748815518,
+          "n_timesteps": 10,
+          "snes_fnorm_final": 0.006752100972361067,
+          "snes_its": 0,
+          "snes_reason": "DIVERGED_LINEAR_SOLVE"
+        }
+      },
+      "theta": 1.0,
+      "tol": 1e-50
+    },
+    "8": {
+      "dt": 0.010416666666666666,
+      "effective_options": {
+        "ksp_atol": "1e-50",
+        "ksp_max_it": "10",
+        "ksp_rtol": "1e-50",
+        "pc_type": "gamg",
+        "snes_atol": "1e-50",
+        "snes_ksp_ew": null,
+        "snes_max_it": "10",
+        "snes_rtol": "1e-50"
+      },
+      "max_drift_from_initial": 1.2244845510575975e-16,
+      "model": "advdiff-scaling",
+      "monotone_mode": null,
+      "n_steady_steps": 10,
+      "nprocs": 8,
+      "placement": {
+        "n_nodes": 1,
+        "ranks_per_node_max": 8,
+        "ranks_per_node_min": 8
+      },
+      "res": 48,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 10,
+          "ksp_its_total": 10,
+          "ksp_reason": "DIVERGED_MAX_IT",
+          "ksp_rnorm_final": 0.05523681832330512,
+          "snes_fnorm_final": 0.019041322289841383,
+          "snes_its": 0,
+          "snes_reason": "DIVERGED_LINEAR_SOLVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 10,
+          "ksp_its_total": 0,
+          "ksp_reason": "DIVERGED_MAX_IT",
+          "ksp_rnorm_final": 0.05726012816217717,
+          "n_timesteps": 10,
+          "snes_fnorm_final": 0.0190413222898432,
+          "snes_its": 0,
+          "snes_reason": "DIVERGED_LINEAR_SOLVE"
+        }
+      },
+      "theta": 1.0,
+      "tol": 1e-50
+    }
+  },
+  "weak-scaling-2026-advdiff-meshindep": {
+    "1": {
+      "dt": 0.020833333333333332,
+      "effective_options": {
+        "ksp_atol": "1e-06",
+        "ksp_max_it": null,
+        "ksp_rtol": "1e-06",
+        "pc_type": "gamg",
+        "snes_atol": "1e-06",
+        "snes_ksp_ew": null,
+        "snes_max_it": null,
+        "snes_rtol": "1e-06"
+      },
+      "max_drift_from_initial": 0.9991106527360502,
+      "model": "advdiff-scaling",
+      "monotone_mode": null,
+      "n_steady_steps": 10,
+      "nprocs": 1,
+      "placement": {
+        "n_nodes": 1,
+        "ranks_per_node_max": 1,
+        "ranks_per_node_min": 1
+      },
+      "res": 24,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 8,
+          "ksp_its_total": 29,
+          "ksp_reason": "CONVERGED_ATOL",
+          "ksp_rnorm_final": 9.17899760147943e-07,
+          "snes_fnorm_final": 1.9689043451821687e-08,
+          "snes_its": 2,
+          "snes_reason": "CONVERGED_FNORM_ABS"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 17,
+          "ksp_its_total": -12,
+          "ksp_reason": "CONVERGED_ATOL",
+          "ksp_rnorm_final": 6.86047230271591e-07,
+          "n_timesteps": 10,
+          "snes_fnorm_final": 1.5291382235044003e-08,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_ABS"
+        }
+      },
+      "theta": 1.0,
+      "tol": 1e-06
+    },
+    "64": {
+      "dt": 0.005208333333333333,
+      "effective_options": {
+        "ksp_atol": "1e-06",
+        "ksp_max_it": null,
+        "ksp_rtol": "1e-06",
+        "pc_type": "gamg",
+        "snes_atol": "1e-06",
+        "snes_ksp_ew": null,
+        "snes_max_it": null,
+        "snes_rtol": "1e-06"
+      },
+      "max_drift_from_initial": 0.8176162924060035,
+      "model": "advdiff-scaling",
+      "monotone_mode": null,
+      "n_steady_steps": 10,
+      "nprocs": 64,
+      "placement": {
+        "n_nodes": 2,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 16
+      },
+      "res": 96,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 14,
+          "ksp_its_total": 38,
+          "ksp_reason": "CONVERGED_ATOL",
+          "ksp_rnorm_final": 9.887111359953205e-07,
+          "snes_fnorm_final": 4.600920035322411e-09,
+          "snes_its": 2,
+          "snes_reason": "CONVERGED_FNORM_ABS"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 24,
+          "ksp_its_total": -14,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 4.155867343114338e-05,
+          "n_timesteps": 10,
+          "snes_fnorm_final": 2.1192346116176634e-07,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_ABS"
+        }
+      },
+      "theta": 1.0,
+      "tol": 1e-06
+    },
+    "8": {
+      "dt": 0.010416666666666666,
+      "effective_options": {
+        "ksp_atol": "1e-06",
+        "ksp_max_it": null,
+        "ksp_rtol": "1e-06",
+        "pc_type": "gamg",
+        "snes_atol": "1e-06",
+        "snes_ksp_ew": null,
+        "snes_max_it": null,
+        "snes_rtol": "1e-06"
+      },
+      "max_drift_from_initial": 0.967438293953121,
+      "model": "advdiff-scaling",
+      "monotone_mode": null,
+      "n_steady_steps": 10,
+      "nprocs": 8,
+      "placement": {
+        "n_nodes": 1,
+        "ranks_per_node_max": 8,
+        "ranks_per_node_min": 8
+      },
+      "res": 48,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 12,
+          "ksp_its_total": 35,
+          "ksp_reason": "CONVERGED_ATOL",
+          "ksp_rnorm_final": 7.138486510016549e-07,
+          "snes_fnorm_final": 7.285064804371693e-09,
+          "snes_its": 2,
+          "snes_reason": "CONVERGED_FNORM_ABS"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 23,
+          "ksp_its_total": -12,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 4.738472081323598e-06,
+          "n_timesteps": 10,
+          "snes_fnorm_final": 5.0314102569265144e-08,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_ABS"
+        }
+      },
+      "theta": 1.0,
+      "tol": 1e-06
+    }
+  },
+  "weak-scaling-2026-checkpoint": {
+    "1": {
+      "checkpoint_bytes": 30187320,
+      "model": "checkpoint-scaling",
+      "n_eval_points": 12300,
+      "nprocs": 1,
+      "placement": {
+        "n_nodes": 1,
+        "ranks_per_node_max": 1,
+        "ranks_per_node_min": 1
+      },
+      "res": 24,
+      "roundtrip_T_err": 0.0,
+      "roundtrip_p_err": 0.0,
+      "roundtrip_v_err": 0.0,
+      "scaling": "Weak"
+    },
+    "1000": {
+      "checkpoint_bytes": 27107147810,
+      "model": "checkpoint-scaling",
+      "n_eval_points": 11323538,
+      "nprocs": 1000,
+      "placement": {
+        "n_nodes": 21,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 40
+      },
+      "res": 240,
+      "roundtrip_T_err": 0.0,
+      "roundtrip_p_err": 0.0,
+      "roundtrip_v_err": 0.0,
+      "scaling": "Weak"
+    },
+    "125": {
+      "checkpoint_bytes": 3427081868,
+      "model": "checkpoint-scaling",
+      "n_eval_points": 1431955,
+      "nprocs": 125,
+      "placement": {
+        "n_nodes": 3,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 29
+      },
+      "res": 120,
+      "roundtrip_T_err": 0.0,
+      "roundtrip_p_err": 0.0,
+      "roundtrip_v_err": 0.0,
+      "scaling": "Weak"
+    },
+    "27": {
+      "checkpoint_bytes": 750625380,
+      "model": "checkpoint-scaling",
+      "n_eval_points": 313857,
+      "nprocs": 27,
+      "placement": {
+        "n_nodes": 1,
+        "ranks_per_node_max": 27,
+        "ranks_per_node_min": 27
+      },
+      "res": 72,
+      "roundtrip_T_err": 0.0,
+      "roundtrip_p_err": 0.0,
+      "roundtrip_v_err": 0.0,
+      "scaling": "Weak"
+    },
+    "343": {
+      "checkpoint_bytes": 9344831334,
+      "model": "checkpoint-scaling",
+      "n_eval_points": 3900997,
+      "nprocs": 343,
+      "placement": {
+        "n_nodes": 8,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 7
+      },
+      "res": 168,
+      "roundtrip_T_err": 0.0,
+      "roundtrip_p_err": 0.0,
+      "roundtrip_v_err": 0.0,
+      "scaling": "Weak"
+    },
+    "64": {
+      "checkpoint_bytes": 1765138944,
+      "model": "checkpoint-scaling",
+      "n_eval_points": 735132,
+      "nprocs": 64,
+      "placement": {
+        "n_nodes": 2,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 16
+      },
+      "res": 96,
+      "roundtrip_T_err": 0.0,
+      "roundtrip_p_err": 0.0,
+      "roundtrip_v_err": 0.0,
+      "scaling": "Weak"
+    },
+    "8": {
+      "checkpoint_bytes": 227308766,
+      "model": "checkpoint-scaling",
+      "n_eval_points": 94312,
+      "nprocs": 8,
+      "placement": {
+        "n_nodes": 1,
+        "ranks_per_node_max": 8,
+        "ranks_per_node_min": 8
+      },
+      "res": 48,
+      "roundtrip_T_err": 0.0,
+      "roundtrip_p_err": 0.0,
+      "roundtrip_v_err": 0.0,
+      "scaling": "Weak"
+    }
+  },
+  "weak-scaling-2026-checkpoint-evalfix": {
+    "1": {
+      "checkpoint_bytes": 30187320,
+      "eval_offnode_max_err": 0.0212830249930408,
+      "eval_offnode_nonfinite": 0,
+      "model": "checkpoint-scaling",
+      "n_eval_points": 12300,
+      "nprocs": 1,
+      "placement": {
+        "n_nodes": 1,
+        "ranks_per_node_max": 1,
+        "ranks_per_node_min": 1
+      },
+      "res": 24,
+      "roundtrip_T_err": 0.0,
+      "roundtrip_p_err": 0.0,
+      "roundtrip_v_err": 0.0,
+      "scaling": "Weak"
+    },
+    "125": {
+      "checkpoint_bytes": 3427081868,
+      "eval_offnode_max_err": 0.006121442624039464,
+      "eval_offnode_nonfinite": 0,
+      "model": "checkpoint-scaling",
+      "n_eval_points": 1431955,
+      "nprocs": 125,
+      "placement": {
+        "n_nodes": 3,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 29
+      },
+      "res": 120,
+      "roundtrip_T_err": 0.0,
+      "roundtrip_p_err": 0.0,
+      "roundtrip_v_err": 0.0,
+      "scaling": "Weak"
+    },
+    "27": {
+      "checkpoint_bytes": 750625380,
+      "eval_offnode_max_err": 0.010158411511337062,
+      "eval_offnode_nonfinite": 0,
+      "model": "checkpoint-scaling",
+      "n_eval_points": 313857,
+      "nprocs": 27,
+      "placement": {
+        "n_nodes": 1,
+        "ranks_per_node_max": 27,
+        "ranks_per_node_min": 27
+      },
+      "res": 72,
+      "roundtrip_T_err": 0.0,
+      "roundtrip_p_err": 0.0,
+      "roundtrip_v_err": 0.0,
+      "scaling": "Weak"
+    },
+    "343": {
+      "checkpoint_bytes": 9344831334,
+      "eval_offnode_max_err": 0.004394456246226031,
+      "eval_offnode_nonfinite": 0,
+      "model": "checkpoint-scaling",
+      "n_eval_points": 3900997,
+      "nprocs": 343,
+      "placement": {
+        "n_nodes": 8,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 7
+      },
+      "res": 168,
+      "roundtrip_T_err": 0.0,
+      "roundtrip_p_err": 0.0,
+      "roundtrip_v_err": 0.0,
+      "scaling": "Weak"
+    },
+    "64": {
+      "checkpoint_bytes": 1765138944,
+      "eval_offnode_max_err": 0.007669029044590436,
+      "eval_offnode_nonfinite": 0,
+      "model": "checkpoint-scaling",
+      "n_eval_points": 735132,
+      "nprocs": 64,
+      "placement": {
+        "n_nodes": 2,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 16
+      },
+      "res": 96,
+      "roundtrip_T_err": 0.0,
+      "roundtrip_p_err": 0.0,
+      "roundtrip_v_err": 0.0,
+      "scaling": "Weak"
+    },
+    "8": {
+      "checkpoint_bytes": 227308766,
+      "eval_offnode_max_err": 0.01486295123509318,
+      "eval_offnode_nonfinite": 0,
+      "model": "checkpoint-scaling",
+      "n_eval_points": 94312,
+      "nprocs": 8,
+      "placement": {
+        "n_nodes": 1,
+        "ranks_per_node_max": 8,
+        "ranks_per_node_min": 8
+      },
+      "res": 48,
+      "roundtrip_T_err": 0.0,
+      "roundtrip_p_err": 0.0,
+      "roundtrip_v_err": 0.0,
+      "scaling": "Weak"
+    }
+  },
+  "weak-scaling-2026-poisson-analytic": {
+    "1": {
+      "init_state": "analytic",
+      "model": "poisson-scaling",
+      "nprocs": 1,
+      "rel_norm": 2.4133049662563694e-17,
+      "res": 24,
+      "scaling": "Weak"
+    },
+    "125": {
+      "init_state": "analytic",
+      "model": "poisson-scaling",
+      "nprocs": 125,
+      "rel_norm": 1.0597772914535508e-17,
+      "res": 120,
+      "scaling": "Weak"
+    }
+  },
+  "weak-scaling-2026-stokes-BASE10": {
+    "1": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-06",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.2999999999999996e-07",
+        "ksp_atol": "1e-11",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "50",
+        "snes_rtol": "9.999999999999999e-06"
+      },
+      "inner_rtol": 1e-06,
+      "model": "stokes-scaling",
+      "nprocs": 1,
+      "res": 10,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.0352228317873106e-08,
+          "snes_fnorm_final": 1.0352228317888293e-08,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.025142055451182e-08,
+          "snes_fnorm_final": 1.0251420554356523e-08,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        }
+      },
+      "tolerance_effective": 9.999999999999999e-06,
+      "tolerance_requested": 1e-08
+    },
+    "125": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-06",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.2999999999999996e-07",
+        "ksp_atol": "1e-11",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "50",
+        "snes_rtol": "9.999999999999999e-06"
+      },
+      "inner_rtol": 1e-06,
+      "model": "stokes-scaling",
+      "nprocs": 125,
+      "res": 50,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.143663258603777e-08,
+          "snes_fnorm_final": 1.1436632586040153e-08,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 8.505630406469035e-09,
+          "snes_fnorm_final": 8.50563040639682e-09,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        }
+      },
+      "tolerance_effective": 9.999999999999999e-06,
+      "tolerance_requested": 1e-08
+    },
+    "27": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-06",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.2999999999999996e-07",
+        "ksp_atol": "1e-11",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "50",
+        "snes_rtol": "9.999999999999999e-06"
+      },
+      "inner_rtol": 1e-06,
+      "model": "stokes-scaling",
+      "nprocs": 27,
+      "res": 30,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 5.57795189548268e-09,
+          "snes_fnorm_final": 5.5779518954774255e-09,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 5.6957165137390464e-09,
+          "snes_fnorm_final": 5.6957165139404815e-09,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        }
+      },
+      "tolerance_effective": 9.999999999999999e-06,
+      "tolerance_requested": 1e-08
+    },
+    "64": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-06",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.2999999999999996e-07",
+        "ksp_atol": "1e-11",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "50",
+        "snes_rtol": "9.999999999999999e-06"
+      },
+      "inner_rtol": 1e-06,
+      "model": "stokes-scaling",
+      "nprocs": 64,
+      "res": 40,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 5.279698313247182e-09,
+          "snes_fnorm_final": 5.279698313310078e-09,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 5.2249157999746255e-09,
+          "snes_fnorm_final": 5.224915800063586e-09,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        }
+      },
+      "tolerance_effective": 9.999999999999999e-06,
+      "tolerance_requested": 1e-08
+    },
+    "8": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-06",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.2999999999999996e-07",
+        "ksp_atol": "1e-11",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "50",
+        "snes_rtol": "9.999999999999999e-06"
+      },
+      "inner_rtol": 1e-06,
+      "model": "stokes-scaling",
+      "nprocs": 8,
+      "res": 20,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.1946614093531309e-08,
+          "snes_fnorm_final": 1.1946614093425822e-08,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.1800216631270925e-08,
+          "snes_fnorm_final": 1.1800216631143758e-08,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        }
+      },
+      "tolerance_effective": 9.999999999999999e-06,
+      "tolerance_requested": 1e-08
+    }
+  },
+  "weak-scaling-2026-stokes-BASE10-spread": {
+    "1": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-06",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.2999999999999996e-07",
+        "ksp_atol": "1e-11",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "50",
+        "snes_rtol": "9.999999999999999e-06"
+      },
+      "inner_rtol": 1e-06,
+      "model": "stokes-scaling",
+      "nprocs": 1,
+      "placement": {
+        "n_nodes": 1,
+        "ranks_per_node_max": 1,
+        "ranks_per_node_min": 1
+      },
+      "res": 10,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.0352228317873106e-08,
+          "snes_fnorm_final": 1.0352228317888293e-08,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.025142055451182e-08,
+          "snes_fnorm_final": 1.0251420554356523e-08,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        }
+      },
+      "tolerance_effective": 9.999999999999999e-06,
+      "tolerance_requested": 1e-08
+    },
+    "125": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-06",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.2999999999999996e-07",
+        "ksp_atol": "1e-11",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "50",
+        "snes_rtol": "9.999999999999999e-06"
+      },
+      "inner_rtol": 1e-06,
+      "model": "stokes-scaling",
+      "nprocs": 125,
+      "placement": {
+        "n_nodes": 9,
+        "ranks_per_node_max": 14,
+        "ranks_per_node_min": 13
+      },
+      "res": 50,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.1436632585841161e-08,
+          "snes_fnorm_final": 1.1436632585813876e-08,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 8.505630407012364e-09,
+          "snes_fnorm_final": 8.505630406961044e-09,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        }
+      },
+      "tolerance_effective": 9.999999999999999e-06,
+      "tolerance_requested": 1e-08
+    },
+    "27": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-06",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.2999999999999996e-07",
+        "ksp_atol": "1e-11",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "50",
+        "snes_rtol": "9.999999999999999e-06"
+      },
+      "inner_rtol": 1e-06,
+      "model": "stokes-scaling",
+      "nprocs": 27,
+      "placement": {
+        "n_nodes": 2,
+        "ranks_per_node_max": 14,
+        "ranks_per_node_min": 13
+      },
+      "res": 30,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 5.577951892745553e-09,
+          "snes_fnorm_final": 5.5779518929676876e-09,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 5.695716512240757e-09,
+          "snes_fnorm_final": 5.695716512251757e-09,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        }
+      },
+      "tolerance_effective": 9.999999999999999e-06,
+      "tolerance_requested": 1e-08
+    },
+    "64": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-06",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.2999999999999996e-07",
+        "ksp_atol": "1e-11",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "50",
+        "snes_rtol": "9.999999999999999e-06"
+      },
+      "inner_rtol": 1e-06,
+      "model": "stokes-scaling",
+      "nprocs": 64,
+      "placement": {
+        "n_nodes": 4,
+        "ranks_per_node_max": 16,
+        "ranks_per_node_min": 16
+      },
+      "res": 40,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 5.279698315688508e-09,
+          "snes_fnorm_final": 5.279698315817096e-09,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 5.22491579914854e-09,
+          "snes_fnorm_final": 5.224915799176445e-09,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        }
+      },
+      "tolerance_effective": 9.999999999999999e-06,
+      "tolerance_requested": 1e-08
+    },
+    "8": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-06",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.2999999999999996e-07",
+        "ksp_atol": "1e-11",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "50",
+        "snes_rtol": "9.999999999999999e-06"
+      },
+      "inner_rtol": 1e-06,
+      "model": "stokes-scaling",
+      "nprocs": 8,
+      "placement": {
+        "n_nodes": 2,
+        "ranks_per_node_max": 4,
+        "ranks_per_node_min": 4
+      },
+      "res": 20,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.1946614096241439e-08,
+          "snes_fnorm_final": 1.1946614096185346e-08,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.1800216636716155e-08,
+          "snes_fnorm_final": 1.180021663656737e-08,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        }
+      },
+      "tolerance_effective": 9.999999999999999e-06,
+      "tolerance_requested": 1e-08
+    }
+  },
+  "weak-scaling-2026-stokes-BASE5-3way/1e-3": {
+    "1": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "0.001",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "0.00033",
+        "ksp_atol": "1e-08",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "50",
+        "snes_rtol": "0.01"
+      },
+      "inner_rtol": 0.001,
+      "model": "stokes-scaling",
+      "nprocs": 1,
+      "res": 5,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 2.5422937515548275e-05,
+          "snes_fnorm_final": 2.5422937515548875e-05,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 2.5384491353569654e-05,
+          "snes_fnorm_final": 2.5384491353569675e-05,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        }
+      },
+      "tolerance_effective": 0.01,
+      "tolerance_requested": 1e-08
+    },
+    "125": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "0.001",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "0.00033",
+        "ksp_atol": "1e-08",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "50",
+        "snes_rtol": "0.01"
+      },
+      "inner_rtol": 0.001,
+      "model": "stokes-scaling",
+      "nprocs": 125,
+      "res": 25,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 9.453890767083302e-06,
+          "snes_fnorm_final": 9.453890767083395e-06,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 9.393481053102427e-06,
+          "snes_fnorm_final": 9.393481053102358e-06,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        }
+      },
+      "tolerance_effective": 0.01,
+      "tolerance_requested": 1e-08
+    },
+    "27": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "0.001",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "0.00033",
+        "ksp_atol": "1e-08",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "50",
+        "snes_rtol": "0.01"
+      },
+      "inner_rtol": 0.001,
+      "model": "stokes-scaling",
+      "nprocs": 27,
+      "res": 15,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.203376008569782e-05,
+          "snes_fnorm_final": 1.2033760085697929e-05,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.1950653165799387e-05,
+          "snes_fnorm_final": 1.195065316579945e-05,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        }
+      },
+      "tolerance_effective": 0.01,
+      "tolerance_requested": 1e-08
+    },
+    "64": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "0.001",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "0.00033",
+        "ksp_atol": "1e-08",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "50",
+        "snes_rtol": "0.01"
+      },
+      "inner_rtol": 0.001,
+      "model": "stokes-scaling",
+      "nprocs": 64,
+      "res": 20,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.0670844836197388e-05,
+          "snes_fnorm_final": 1.0670844836197329e-05,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.0599935739631245e-05,
+          "snes_fnorm_final": 1.0599935739631103e-05,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        }
+      },
+      "tolerance_effective": 0.01,
+      "tolerance_requested": 1e-08
+    },
+    "8": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "0.001",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "0.00033",
+        "ksp_atol": "1e-08",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "50",
+        "snes_rtol": "0.01"
+      },
+      "inner_rtol": 0.001,
+      "model": "stokes-scaling",
+      "nprocs": 8,
+      "res": 10,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.1449532638140191e-05,
+          "snes_fnorm_final": 1.1449532638140018e-05,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.140197060541794e-05,
+          "snes_fnorm_final": 1.1401970605417832e-05,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        }
+      },
+      "tolerance_effective": 0.01,
+      "tolerance_requested": 1e-08
+    }
+  },
+  "weak-scaling-2026-stokes-BASE5-3way/1e-6": {
+    "1": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-06",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.2999999999999996e-07",
+        "ksp_atol": "1e-11",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "50",
+        "snes_rtol": "9.999999999999999e-06"
+      },
+      "inner_rtol": 1e-06,
+      "model": "stokes-scaling",
+      "nprocs": 1,
+      "res": 5,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 2.2173373445992793e-08,
+          "snes_fnorm_final": 2.2173373446276116e-08,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 2.212155580029141e-08,
+          "snes_fnorm_final": 2.2121555800096008e-08,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        }
+      },
+      "tolerance_effective": 9.999999999999999e-06,
+      "tolerance_requested": 1e-08
+    },
+    "1000": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-06",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.2999999999999996e-07",
+        "ksp_atol": "1e-11",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "50",
+        "snes_rtol": "9.999999999999999e-06"
+      },
+      "inner_rtol": 1e-06,
+      "model": "stokes-scaling",
+      "nprocs": 1000,
+      "res": 50,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.6003365678114085e-08,
+          "snes_fnorm_final": 1.600336567799436e-08,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 2.258874563540373e-08,
+          "snes_fnorm_final": 2.2588745635373227e-08,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        }
+      },
+      "tolerance_effective": 9.999999999999999e-06,
+      "tolerance_requested": 1e-08
+    },
+    "125": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-06",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.2999999999999996e-07",
+        "ksp_atol": "1e-11",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "50",
+        "snes_rtol": "9.999999999999999e-06"
+      },
+      "inner_rtol": 1e-06,
+      "model": "stokes-scaling",
+      "nprocs": 125,
+      "res": 25,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.025095559092014e-08,
+          "snes_fnorm_final": 1.0250955590863224e-08,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.0122599447650558e-08,
+          "snes_fnorm_final": 1.0122599447483006e-08,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        }
+      },
+      "tolerance_effective": 9.999999999999999e-06,
+      "tolerance_requested": 1e-08
+    },
+    "27": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-06",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.2999999999999996e-07",
+        "ksp_atol": "1e-11",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "50",
+        "snes_rtol": "9.999999999999999e-06"
+      },
+      "inner_rtol": 1e-06,
+      "model": "stokes-scaling",
+      "nprocs": 27,
+      "res": 15,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.1217441006378347e-08,
+          "snes_fnorm_final": 1.121744100648404e-08,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.1103493715948567e-08,
+          "snes_fnorm_final": 1.1103493715706686e-08,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        }
+      },
+      "tolerance_effective": 9.999999999999999e-06,
+      "tolerance_requested": 1e-08
+    },
+    "343": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-06",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.2999999999999996e-07",
+        "ksp_atol": "1e-11",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "50",
+        "snes_rtol": "9.999999999999999e-06"
+      },
+      "inner_rtol": 1e-06,
+      "model": "stokes-scaling",
+      "nprocs": 343,
+      "res": 35,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 5.367424971129963e-09,
+          "snes_fnorm_final": 5.3674249709021485e-09,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 5.359445108320389e-09,
+          "snes_fnorm_final": 5.359445108213819e-09,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        }
+      },
+      "tolerance_effective": 9.999999999999999e-06,
+      "tolerance_requested": 1e-08
+    },
+    "64": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-06",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.2999999999999996e-07",
+        "ksp_atol": "1e-11",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "50",
+        "snes_rtol": "9.999999999999999e-06"
+      },
+      "inner_rtol": 1e-06,
+      "model": "stokes-scaling",
+      "nprocs": 64,
+      "res": 20,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.1459646469535869e-08,
+          "snes_fnorm_final": 1.1459646469424719e-08,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.1325380141750386e-08,
+          "snes_fnorm_final": 1.1325380141617572e-08,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        }
+      },
+      "tolerance_effective": 9.999999999999999e-06,
+      "tolerance_requested": 1e-08
+    },
+    "8": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-06",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.2999999999999996e-07",
+        "ksp_atol": "1e-11",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "50",
+        "snes_rtol": "9.999999999999999e-06"
+      },
+      "inner_rtol": 1e-06,
+      "model": "stokes-scaling",
+      "nprocs": 8,
+      "res": 10,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.1683414529827657e-08,
+          "snes_fnorm_final": 1.1683414529689521e-08,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.1628613488410853e-08,
+          "snes_fnorm_final": 1.1628613488241845e-08,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        }
+      },
+      "tolerance_effective": 9.999999999999999e-06,
+      "tolerance_requested": 1e-08
+    }
+  },
+  "weak-scaling-2026-stokes-BASE5-3way/default": {
+    "1": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-09",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.3e-10",
+        "ksp_atol": "1e-14",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "50",
+        "snes_rtol": "1e-08"
+      },
+      "inner_rtol": null,
+      "model": "stokes-scaling",
+      "nprocs": 1,
+      "res": 5,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 2.5677478798654462e-11,
+          "snes_fnorm_final": 2.567747882890425e-11,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 2.5611704021146644e-11,
+          "snes_fnorm_final": 2.5611704281993588e-11,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        }
+      },
+      "tolerance_effective": 1e-08,
+      "tolerance_requested": 1e-08
+    },
+    "1000": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-09",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.3e-10",
+        "ksp_atol": "1e-14",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "50",
+        "snes_rtol": "1e-08"
+      },
+      "inner_rtol": null,
+      "model": "stokes-scaling",
+      "nprocs": 1000,
+      "res": 50,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 6.768364060556046e-12,
+          "snes_fnorm_final": 6.768364013560897e-12,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 6.755164837239891e-12,
+          "snes_fnorm_final": 6.7551647796948825e-12,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        }
+      },
+      "tolerance_effective": 1e-08,
+      "tolerance_requested": 1e-08
+    },
+    "125": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-09",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.3e-10",
+        "ksp_atol": "1e-14",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "50",
+        "snes_rtol": "1e-08"
+      },
+      "inner_rtol": null,
+      "model": "stokes-scaling",
+      "nprocs": 125,
+      "res": 25,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 6.759248899044363e-12,
+          "snes_fnorm_final": 6.759248922253673e-12,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 6.6356332541340414e-12,
+          "snes_fnorm_final": 6.635633206019437e-12,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        }
+      },
+      "tolerance_effective": 1e-08,
+      "tolerance_requested": 1e-08
+    },
+    "27": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-09",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.3e-10",
+        "ksp_atol": "1e-14",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "50",
+        "snes_rtol": "1e-08"
+      },
+      "inner_rtol": null,
+      "model": "stokes-scaling",
+      "nprocs": 27,
+      "res": 15,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.108045701057415e-11,
+          "snes_fnorm_final": 1.1080457024038955e-11,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.7789978947192614e-11,
+          "snes_fnorm_final": 1.778997888370944e-11,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        }
+      },
+      "tolerance_effective": 1e-08,
+      "tolerance_requested": 1e-08
+    },
+    "343": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-09",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.3e-10",
+        "ksp_atol": "1e-14",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "50",
+        "snes_rtol": "1e-08"
+      },
+      "inner_rtol": null,
+      "model": "stokes-scaling",
+      "nprocs": 343,
+      "res": 35,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 6.414374465899757e-12,
+          "snes_fnorm_final": 6.414374385277678e-12,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 6.375777444104947e-12,
+          "snes_fnorm_final": 6.375777461873382e-12,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        }
+      },
+      "tolerance_effective": 1e-08,
+      "tolerance_requested": 1e-08
+    },
+    "64": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-09",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.3e-10",
+        "ksp_atol": "1e-14",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "50",
+        "snes_rtol": "1e-08"
+      },
+      "inner_rtol": null,
+      "model": "stokes-scaling",
+      "nprocs": 64,
+      "res": 20,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 6.179955090635605e-12,
+          "snes_fnorm_final": 6.179955007821666e-12,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 6.090847850989219e-12,
+          "snes_fnorm_final": 6.090847745125344e-12,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        }
+      },
+      "tolerance_effective": 1e-08,
+      "tolerance_requested": 1e-08
+    },
+    "8": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-09",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.3e-10",
+        "ksp_atol": "1e-14",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "50",
+        "snes_rtol": "1e-08"
+      },
+      "inner_rtol": null,
+      "model": "stokes-scaling",
+      "nprocs": 8,
+      "res": 10,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.4096560962405784e-11,
+          "snes_fnorm_final": 1.409656107166411e-11,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.3882276566215306e-11,
+          "snes_fnorm_final": 1.3882276544383804e-11,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        }
+      },
+      "tolerance_effective": 1e-08,
+      "tolerance_requested": 1e-08
+    }
+  },
+  "weak-scaling-2026-stokes-BASE5-innerscan/1e-4": {
+    "1": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "0.0001",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.3e-05",
+        "ksp_atol": "1e-09",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "50",
+        "snes_rtol": "0.001"
+      },
+      "inner_rtol": 0.0001,
+      "model": "stokes-scaling",
+      "nprocs": 1,
+      "res": 5,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.027549824067218e-06,
+          "snes_fnorm_final": 1.0275498240671613e-06,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.022146228537646e-06,
+          "snes_fnorm_final": 1.02214622853763e-06,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        }
+      },
+      "tolerance_effective": 0.001,
+      "tolerance_requested": 1e-08
+    }
+  },
+  "weak-scaling-2026-stokes-BASE5-innerscan/1e-5": {
+    "1": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-05",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.3e-06",
+        "ksp_atol": "1e-10",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "50",
+        "snes_rtol": "0.0001"
+      },
+      "inner_rtol": 1e-05,
+      "model": "stokes-scaling",
+      "nprocs": 1,
+      "res": 5,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.5072390061658572e-07,
+          "snes_fnorm_final": 1.5072390061655055e-07,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.500161991852822e-07,
+          "snes_fnorm_final": 1.50016199185399e-07,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        }
+      },
+      "tolerance_effective": 0.0001,
+      "tolerance_requested": 1e-08
+    }
+  },
+  "weak-scaling-2026-stokes-BASE5-innerscan/1e-6": {
+    "1": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-06",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.2999999999999996e-07",
+        "ksp_atol": "1e-11",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "50",
+        "snes_rtol": "9.999999999999999e-06"
+      },
+      "inner_rtol": 1e-06,
+      "model": "stokes-scaling",
+      "nprocs": 1,
+      "res": 5,
+      "scaling": "Weak",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 2.2173373445992793e-08,
+          "snes_fnorm_final": 2.2173373446276116e-08,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 2.212155580029141e-08,
+          "snes_fnorm_final": 2.2121555800096008e-08,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        }
+      },
+      "tolerance_effective": 9.999999999999999e-06,
+      "tolerance_requested": 1e-08
+    }
+  }
+}

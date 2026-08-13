@@ -1,0 +1,34 @@
+{
+  "round": "2026-08_uw3-v3.1.0",
+  "generated": "2026-08-13",
+  "uw3_version": "v3.1.0",
+  "benchmark_version": 1,
+  "benchmark_note": "poisson analytic init + zero_init_guess=False; checkpoint has no Stokes solve, adds eval stages; advdiff nsteps split from maxits; stokes simplified body force + Dirichlet BCs",
+  "sites": {
+    "gadi": {
+      "petsc_version": "3.25.0",
+      "container": "/g/data/m18/software/containers/underworld3-gadi_v3.1.0.sif",
+      "queue": "normal",
+      "cores_per_node": 48
+    }
+  },
+  "campaigns": [
+    "weak-scaling-2026-BASE24-container2",
+    "weak-scaling-2026-advdiff-BASE24",
+    "weak-scaling-2026-advdiff-meshindep",
+    "weak-scaling-2026-checkpoint",
+    "weak-scaling-2026-checkpoint-evalfix",
+    "weak-scaling-2026-poisson-analytic",
+    "weak-scaling-2026-stokes-BASE10",
+    "weak-scaling-2026-stokes-BASE10-spread",
+    "weak-scaling-2026-stokes-BASE5-3way/1e-3",
+    "weak-scaling-2026-stokes-BASE5-3way/1e-6",
+    "weak-scaling-2026-stokes-BASE5-3way/default",
+    "weak-scaling-2026-stokes-BASE5-innerscan/1e-4",
+    "weak-scaling-2026-stokes-BASE5-innerscan/1e-5",
+    "weak-scaling-2026-stokes-BASE5-innerscan/1e-6"
+  ],
+  "missing_campaigns": [],
+  "n_runs": 150,
+  "raw_output_note": "Raw PETSc logs (5.8 GB, one 423 MB file at 2197 ranks) lived under /scratch/el06/jg0883 on Gadi and are subject to scratch purging. This reduction is the archival copy: it holds every number the figures use."
+}
