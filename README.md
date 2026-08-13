@@ -24,14 +24,17 @@ In the order the results are presented below.
 | | **Advection–diffusion** | |
 | 4 | Semi-Lagrangian advection does not scale, and is still climbing at 1000 ranks | SLCN 460.6 → 3496.0 s (eff 0.13) with solver work pinned; SNES in the same stage holds 0.89 |
 | 5 | A third of a serial SLCN timestep loop is a fallback projection — legitimate, since a derivative cannot go through `evaluate`, but invisible to users | `SNES_MultiComponent.solve` 326.9 s vs `SNES_Scalar.solve` 156.2 s at 1 rank |
-| 6 | Jacobian re-assembled every timestep on constant operators | `SNESJacobianEval` 282.7 s for 20 evaluations at 1 rank, where 2 would do |
 | | **Checkpoint I/O and `evaluate`** | |
-| 7 | `read_timestep` does not scale — but it is a coordinate-remap reader (rank-0 file read, swarm migration, per-rank KDTree), not a field read. `write_timestep` degrades gracefully | read 1.1 → 263.4 s (eff 0.004) against write 4.3 → 69.7 s (eff 0.06); the native `read_checkpoint()` path was not measured |
-| 8 | `evaluate` at a variable's own coordinates collapses | 19 → 471 µs/pt (eff 0.05) vs 22.5 → 45.8 µs/pt at cell interiors (eff 0.56) |
-| | **v3.1.0 release artefacts** — present in the released container, not in UW3 main | |
-| 9 | `cache=False` in `SNES_Stokes_SaddlePt._build()` disables the JIT cache | 5.8 s serial → 13.6 s at 1000 ranks; commit `2d3a0895` |
-| 10 | `solve()` overwrites user-set options — already fixed upstream (#477) | `snes_max_it` 3 → 50, inner rtols reverted |
-| 11 | 32-bit PETSc indices cap the container at 2197 ranks; `--with-64-bit-indices` would lift it | `2147483650 is too big for PetscInt` at 4913 ranks |
+| 6 | `read_timestep` does not scale — but it is a coordinate-remap reader (rank-0 file read, swarm migration, per-rank KDTree), not a field read. `write_timestep` degrades gracefully | read 1.1 → 263.4 s (eff 0.004) against write 4.3 → 69.7 s (eff 0.06); the native `read_checkpoint()` path was not measured |
+| 7 | `evaluate` at a variable's own coordinates collapses | 19 → 471 µs/pt (eff 0.05) vs 22.5 → 45.8 µs/pt at cell interiors (eff 0.56) |
+
+**About the release artefact.** Three properties of the v3.1.0 container shaped these runs but
+are not UW3 behaviour. `cache=False` in `SNES_Stokes_SaddlePt._build()` disables the JIT cache,
+so every rank recompiles every run (5.8 s serial → 13.6 s at 1000 ranks; commit `2d3a0895`).
+`solve()` overwrites user-set options — already fixed upstream (#477), but present here, and it
+is why the Stokes inner tolerance had to be set by moving the outer one. And 32-bit PETSc
+indices cap the container at 2197 ranks (`2147483650 is too big for PetscInt` at 4913), which
+is the hard ceiling on this study; `--with-64-bit-indices` would lift it.
 
 ## Poisson
 
