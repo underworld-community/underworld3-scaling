@@ -1,0 +1,13 @@
+# Raw campaign output — 5.8 GB, one timing.csv is 423 MB. Ephemeral by design:
+# /scratch is purged. The committed archive is data/<round>/, produced by
+# analysis/export_data.py, which holds every number the figures use.
+weak-scaling-*/
+plots-*/
+
+# Derived: rebuilt by analysis/export_data.py and the fig_*.py scripts.
+analysis/.cache/
+
+__pycache__/
+*.pyc
+.claude/
+.DS_Store
