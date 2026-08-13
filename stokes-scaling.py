@@ -1,405 +1,423 @@
-# ---
-# jupyter:
-#   jupytext:
-#     cell_metadata_filter: -all
-#     custom_cell_magics: kql
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.3'
-#       jupytext_version: 1.11.2
-#   kernelspec:
-#     display_name: uw3-mamba-run
-#     language: python
-#     name: python3
-# ---
+"""
+Spherical shell Stokes benchmark (isoviscous, incompressible) — scaling test.
 
-# %% [markdown]
-# ## Spherical Benchmark: Isoviscous Incompressible Stokes
-#
-# ##### Case 4: No slip boundaries and smooth density distribution
-# <!--
-#     1. Works fine (i.e., bc produce results)
-# -->
-# Adapted for scaling tests for the JOSS paper.
-#
-# Full implementation [here](https://github.com/underworldcode/underworld3-documentation/blob/main/Notebooks/Examples-Spherical-Stokes/Ex_Stokes_Spherical_Benchmark_Kramer.py).
-#
+Simple no-slip spherical shell driven by a radial body force.
+Tests Stokes multigrid preconditioner scaling without analytical overhead.
 
-# %%
+Removed from the original accuracy benchmark:
+  - assess library (analytical solution evaluation)
+  - analytical_setup stage (Python loops over nodes — not parallel-scalable)
+  - error_analysis stage (same issue)
+  - natural BCs based on analytical velocity
+
+PETSc log stages:
+  mesh_setup   — SphericalShell mesh creation
+  solver_setup — Stokes object, constitutive model, BCs
+  first_solve  — single KSP/SNES solve (includes JIT compilation)
+  steady_solves — re-solve from zero IC (JIT-warm; isolates pure solver cost)
+
+Usage (via launcher):
+  mpiexec -n $NTASKS python stokes-scaling.py \\
+      -uw_scaling $TYPE -uw_res $UW_RESOLUTION -uw_tol $UW_SOL_TOLERANCE \\
+      -uw_maxits $UW_MAX_ITS -uw_job $JOB_IDX -uw_idx $RUN_IDX
+"""
+
 import os
-os.environ["UW_TIMING_ENABLE"] = "1"
-os.environ["SYMPY_USE_CACHE"] = "no"
+import json
+from enum import Enum
 
-from mpi4py import MPI
+import sympy
+from petsc4py import PETSc
+
 import underworld3 as uw
 from underworld3.systems import Stokes
 
-import numpy as np
-import sympy
+# --------------------------------------------------------------------------- #
+# PETSc logging — must be started before any UW3 operations                   #
+# --------------------------------------------------------------------------- #
+uw.timing.start()
 
-import assess
-import h5py
-import sys
-import argparse
+# --------------------------------------------------------------------------- #
+# Parameters (CLI: -uw_name value; notebook: params.uw_name = value)          #
+# --------------------------------------------------------------------------- #
+params = uw.Params(
+    uw_scaling = "none",
+    uw_res     = 8,
+    uw_tol     = 1e-8,
+    uw_job     = 0,
+    uw_idx     = 0,
+    uw_maxits  = 10,
+    uw_vdegree = 2,
+    uw_pdegree = 1,
+    uw_pcont   = True,
+    uw_inner_rtol = 0.0,   # >0 overrides the fieldsplit inner tolerances; 0 = UW3 default
+)
+params.summary("stokes-scaling parameters")
 
-# %%
-if uw.mpi.size == 1:
-    # to fix trame issue
-    import nest_asyncio
-    nest_asyncio.apply()
 
-    import pyvista as pv
-    import underworld3.visualisation as vis
-    import matplotlib.pyplot as plt
-    import cmcrameri.cm as cmc
+#: Options whose effective values decide this campaign's cost, checked after the first
+#: solve because UW3 rewrites some of them during solve() (_reassert_outer_tolerances,
+#: and the tolerance setter's Eisenstat-Walker flags).
+_OPTIONS_TO_REPORT = (
+    "ksp_rtol",
+    "ksp_atol",
+    "ksp_max_it",
+    "snes_rtol",
+    "snes_max_it",
+    "snes_ksp_ew",
+    "fieldsplit_pressure_ksp_rtol",
+    "fieldsplit_pressure_ksp_max_it",
+    "fieldsplit_velocity_ksp_rtol",
+    "fieldsplit_velocity_ksp_max_it",
+)
 
-# %%
-parser = argparse.ArgumentParser()
 
-parser.add_argument("--scaling", type = str, default = "none")
-parser.add_argument("--res", type = int, default = 8)
-parser.add_argument("--tol", type = float, default = 1e-8)
-parser.add_argument("--job", type = int, default = 0)
-parser.add_argument("--idx", type = int, default = 0)
-parser.add_argument("--maxits", type = int, default = 10)
+def report_effective_options(solver, label):
+    """Read options back from the PETSc database, rather than trusting what we set.
 
-args = parser.parse_args()
+    Setting an option and PETSc using it are different things here: the tolerance setter
+    derives the inner fieldsplit rtols, solve() re-asserts the outer ones, and
+    Eisenstat-Walker overrides ksp_rtol per Newton step. Print what actually landed.
+    """
+    opts = solver.petsc_options
+    effective = {}
+    uw.pprint(f"--- effective PETSc options ({label}) ---")
+    for key in _OPTIONS_TO_REPORT:
+        if opts.hasName(key):
+            value = opts.getString(key)
+            effective[key] = value if value != "" else "<set, no value>"
+        else:
+            effective[key] = None
+        uw.pprint(f"    {key:34s} = {effective[key] if effective[key] is not None else '<unset — PETSc default>'}")
+    uw.pprint("-" * 52)
+    return effective
 
-scaling = args.scaling
-res     = args.res
-tol     = args.tol
-job     = args.job
-it      = args.idx
-max_it  = args.maxits
 
+def rank_placement():
+    """How ranks are distributed over nodes.
+
+    Not cosmetic: memory bandwidth is shared per node, so ranks_per_node is a first-order
+    control on solve time. With default dense packing an i^3 weak-scaling sweep runs at
+    1, 8, 27, 48, 48 ranks/node — so the low-rank jobs get several times the bandwidth per
+    rank of the high-rank ones, and efficiency measured against them is confounded.
+    PBS enforces its memory limit per node against this same number.
+    """
+    from mpi4py import MPI
+    from collections import Counter
+
+    names = MPI.COMM_WORLD.allgather(MPI.Get_processor_name())
+    per_node = Counter(names)
+    return {
+        "n_nodes":            len(per_node),
+        "ranks_per_node_max": max(per_node.values()),
+        "ranks_per_node_min": min(per_node.values()),
+    }
+
+
+def _reason_name(reason_cls, code):
+    """PETSc converged-reason integer → its symbolic name, e.g. 2 → CONVERGED_RTOL."""
+    for name in dir(reason_cls):
+        if not name.startswith("_") and getattr(reason_cls, name) == code:
+            return name
+    return str(code)
+
+
+def capture_solver_stats(solver):
+    """
+    Convergence counters for the solve that just finished.
+
+    These are what make a fixed-tolerance campaign readable: wall time alone
+    conflates parallel overhead with algorithmic degradation, but wall time
+    divided by ksp_its_total separates them.
+
+    ksp_its_total is cumulative across Newton steps; ksp_its_outer is the last
+    linear solve only. For this linear problem SNES takes one step, so they agree.
+    """
+    snes = solver.snes
+    ksp  = snes.getKSP()
+    stats = {
+        "snes_its":      snes.getIterationNumber(),
+        "snes_reason":   _reason_name(PETSc.SNES.ConvergedReason, snes.getConvergedReason()),
+        "ksp_its_outer": ksp.getIterationNumber(),
+        "ksp_its_total": snes.getLinearSolveIterations(),
+        "ksp_reason":    _reason_name(PETSc.KSP.ConvergedReason, ksp.getConvergedReason()),
+    }
+
+    # How far the solve actually got. Necessary because the converged REASON does not mean
+    # the same thing between configurations: Eisenstat-Walker picks the outer KSP tolerance
+    # adaptively (~0.3 on the first Newton step), so two runs can both report
+    # CONVERGED_RTOL while differing by orders of magnitude in achieved residual — the
+    # BASE=5 container runs gave 2.5e-11 with tight inner solves and 2.5e-05 with loose
+    # ones. Without these numbers a cheaper-but-less-converged run looks like a free
+    # speedup.
+    try:
+        stats["ksp_rnorm_final"]  = ksp.getResidualNorm()
+        stats["snes_fnorm_final"] = snes.getFunctionNorm()
+    except Exception as exc:
+        stats["ksp_rnorm_final"]  = None
+        stats["snes_fnorm_final"] = None
+        uw.pprint(f"  (residual norms unavailable: {exc})")
+
+    return stats
+
+
+scaling = params.uw_scaling
+res     = params.uw_res
+tol     = params.uw_tol
+job     = params.uw_job
+it      = params.uw_idx
+max_it  = params.uw_maxits
+
+# --------------------------------------------------------------------------- #
+# Output directory                                                             #
+# --------------------------------------------------------------------------- #
+output_base = os.environ.get("OUTPUT_BASE", "/scratch/el06/jg0883")
+dir_name    = os.environ.get("NAME", "out")
+vdegree     = params.uw_vdegree
+pdegree     = params.uw_pdegree
+qdeg        = max(pdegree, vdegree)
+mesh_cache  = os.environ.get("MESH_CACHE", f"{output_base}/mesh_cache")
+pcont       = params.uw_pcont
+stokes_tol  = tol
+
+output_dir = (
+    f"{output_base}/{dir_name}/stokes_out/"
+    f"{scaling}_vdeg{vdegree}_pdeg{pdegree}_tol{tol}_res{res}_job{job}_iter{it}"
+)
 if uw.mpi.rank == 0:
-    print("Parameters passed:")
-    print(f"scaling     : {scaling}")
-    print(f"resolution  : {res}")
-    print(f"tolerance   : {tol}")
-    print(f"job         : {job}")
-    print(f"iteration   : {it}")
-    print(f"max iteration: {max_it}")
-
-# %%
-# mesh options
-r_o = 2.22
-r_int = 2.0
-r_i = 1.22
-
-refine = None
-
-cellsize = 1/res
-
-# %%
-# compute analytical solution
-analytical = True
-visualize = False
-timing = True
-
-# %%
-if timing:
-    uw.timing.reset()
-    uw.timing.start()
-
-# %%
-# specify the case
-case = uw.options.getString('case', default = 'case4')
-
-# spherical harmonic fn degree (l) and order (m)
-l = uw.options.getInt("l", default=2)
-m = uw.options.getInt("m", default=1)
-k = l+1 # power
-
-# %%
-# fem stuff
-
-# stokes_tol = uw.options.getReal("stokes_tol", default = 1e-5)
-stokes_tol = tol
-
-vdegree  = uw.options.getInt("vdegree", default = 2)
-pdegree = uw.options.getInt("pdegree", default = 1)
-pcont = uw.options.getBool("pcont", default = True)
-pcont_str = str(pcont).lower()
-
-vel_penalty = uw.options.getReal("vel_penalty", default = 1e8)
-vel_penalty_str = str("{:.1e}".format(vel_penalty))
-stokes_tol_str = str("{:.1e}".format(stokes_tol))
-
-# %%
-# choosing boundary condition and density perturbation type
-freeslip, noslip, delta_fn, smooth = False, False, False, False
-
-# only case 4
-noslip, smooth = True, True
-
-# %%
-# output dir
-dir_name = str(os.getenv("NAME", "out"))
-output_dir = f"/scratch/el06/jg0883/{dir_name}/stokes_out/{scaling}_vdeg{vdegree}_pdeg{pdegree}_tol{tol}_res{res}_job{job}_iter{it}"
-
-if uw.mpi.rank == 0:
-    print(output_dir)
     os.makedirs(output_dir, exist_ok=True)
+    uw.pprint(f"output: {output_dir}")
 
-# %% [markdown]
-# ### Analytical Solution
+# --------------------------------------------------------------------------- #
+# Mesh geometry                                                                #
+# --------------------------------------------------------------------------- #
+r_o      = 2.22
+r_i      = 1.22
+cellsize = 1.0 / res
 
-# %%
-if analytical:
-    '''
-    For smooth density distribution only single solution exists in the domain.
-    But for sake of code optimization I am creating two solution here.
-    '''
-    soln_above = assess.SphericalStokesSolutionSmoothZeroSlip(l, m, k, Rp=r_o, Rm=r_i, nu=1.0, g=1.0)
-    soln_below = assess.SphericalStokesSolutionSmoothZeroSlip(l, m, k, Rp=r_o, Rm=r_i, nu=1.0, g=1.0)
+# --------------------------------------------------------------------------- #
+# STAGE: mesh_setup                                                            #
+# --------------------------------------------------------------------------- #
+stage = PETSc.Log.Stage("mesh_setup"); stage.push()
 
-# %% [markdown]
-# ### Create Mesh
-
-# %%
-mesh = uw.meshing.SphericalShell(radiusInner=r_i, radiusOuter=r_o, cellSize=cellsize,
-                                    qdegree=max(pdegree, vdegree),
-                                    filename=f'{output_dir}/mesh.msh', refinement=refine)
-#mesh = uw.meshing.CubedSphere(radiusOuter=r_o,
-#                              radiusInner=r_i,
-#                              numElements = res,
-#                              simplex = False,
-#                              qdegree = max(pdegree, vdegree),
-#                              filename = f"{output_dir}/mesh.msh")
-
-# %%
-if uw.mpi.size == 1 and visualize:
-    vis.plot_mesh(mesh, save_png=True, dir_fname=output_dir+'mesh.png', title='', clip_angle=135, cpos='yz')
-
-# %%
-# print mesh size in each cpu
 if uw.mpi.rank == 0:
-    print('-------------------------------------------------------------------------------')
+    os.makedirs(mesh_cache, exist_ok=True)
+uw.mpi.barrier()
+
+cache_file = f"{mesh_cache}/SphericalShell_ri{r_i}_ro{r_o}_res{res}.msh"
+
+if os.path.exists(cache_file):
+    import shutil
+    local_msh = f"{output_dir}/mesh.msh"
+    if uw.mpi.rank == 0:
+        shutil.copy2(cache_file, local_msh)
+    uw.mpi.barrier()
+
+    class _boundaries_spherical(Enum):
+        Lower = 11
+        Upper = 12
+
+    from underworld3.coordinates import CoordinateSystemType
+    mesh = uw.discretisation.Mesh(
+        local_msh,
+        qdegree=qdeg,
+        boundaries=_boundaries_spherical,
+        boundary_normals=None,
+        coordinate_system_type=CoordinateSystemType.SPHERICAL,
+        useMultipleTags=True,
+        useRegions=True,
+        markVertices=True,
+    )
+else:
+    mesh = uw.meshing.SphericalShell(
+        radiusInner=r_i, radiusOuter=r_o,
+        cellSize=cellsize,
+        qdegree=qdeg,
+        filename=cache_file,
+    )
+
+v_uw = uw.discretisation.MeshVariable("V_u", mesh, mesh.dim, degree=vdegree)
+p_uw = uw.discretisation.MeshVariable("P_u", mesh, 1, degree=pdegree, continuous=pcont)
+
+if uw.mpi.rank == 0:
+    uw.pprint("--- mesh partition ---")
 mesh.dm.view()
-if uw.mpi.rank == 0:
-    print('-------------------------------------------------------------------------------')
 
-# %%
-# mesh variables
-v_uw = uw.discretisation.MeshVariable('V_u', mesh, mesh.data.shape[1], degree=vdegree)
-p_uw = uw.discretisation.MeshVariable('P_u', mesh, 1, degree=pdegree, continuous=pcont)
+stage.pop()
 
-if analytical:
-    v_ana = uw.discretisation.MeshVariable('V_a', mesh, mesh.data.shape[1], degree=vdegree)
-    p_ana = uw.discretisation.MeshVariable('P_a', mesh, 1, degree=pdegree, continuous=pcont)
-    rho_ana = uw.discretisation.MeshVariable('RHO_a', mesh, 1, degree=pdegree, continuous=True)
+# --------------------------------------------------------------------------- #
+# STAGE: solver_setup                                                          #
+# --------------------------------------------------------------------------- #
+stage = PETSc.Log.Stage("solver_setup"); stage.push()
 
-    v_err = uw.discretisation.MeshVariable('V_e', mesh, mesh.data.shape[1], degree=vdegree)
-    p_err = uw.discretisation.MeshVariable('P_e', mesh, 1, degree=pdegree, continuous=pcont)
-
-# %%
-norm_v = uw.discretisation.MeshVariable("N", mesh, mesh.data.shape[1], degree=pdegree, varsymbol=r"{\hat{n}}")
-with mesh.access(norm_v):
-    norm_v.data[:,0] = uw.function.evaluate(mesh.CoordinateSystem.unit_e_0[0], norm_v.coords)
-    norm_v.data[:,1] = uw.function.evaluate(mesh.CoordinateSystem.unit_e_0[1], norm_v.coords)
-    norm_v.data[:,2] = uw.function.evaluate(mesh.CoordinateSystem.unit_e_0[2], norm_v.coords)
-
-# %%
-# Some useful coordinate stuff
-unit_rvec = mesh.CoordinateSystem.unit_e_0
 r_uw, th_uw = mesh.CoordinateSystem.xR[0], mesh.CoordinateSystem.xR[1]
-phi_uw =sympy.Piecewise((2*sympy.pi + mesh.CoordinateSystem.xR[2], mesh.CoordinateSystem.xR[2]<0),
-                        (mesh.CoordinateSystem.xR[2], True)
-                       )
+unit_rvec   = mesh.CoordinateSystem.unit_e_0
 
-# Null space in velocity expressed in x,y,z coordinates
-v_theta_phi_fn_xyz = sympy.Matrix(((0,1,1), (-1,0,1), (-1,-1,0))) * mesh.CoordinateSystem.N.T
+# Simple body force: cosine-colatitude density, radially directed gravity.
+# Avoids assoc_legendre/Piecewise — fast sympy compilation.
+rho = (r_uw / r_o) ** 2 * sympy.cos(th_uw)
 
-# %%
-if analytical:
-    with mesh.access(v_ana, p_ana,):
-
-        def get_ana_soln(_var, _r_int, _soln_above, _soln_below):
-            # get analytical solution into mesh variables
-            r = uw.function.evalf(r_uw, _var.coords)
-            for i, coord in enumerate(_var.coords):
-                if r[i]>_r_int:
-                    _var.data[i] = _soln_above(coord)
-                else:
-                    _var.data[i] = _soln_below(coord)
-
-        # velocities
-        get_ana_soln(v_ana, r_int, soln_above.velocity_cartesian, soln_below.velocity_cartesian)
-
-        # pressure
-        get_ana_soln(p_ana, r_int, soln_above.pressure_cartesian, soln_below.pressure_cartesian)
-
-# %%
-# plotting analytical velocities
-clim, vmag, vfreq = [0., 0.001], 5e2, 75
-
-if uw.mpi.size == 1 and analytical and visualize:
-    vis.plot_vector(mesh, v_ana, vector_name='v_ana', cmap=cmc.lapaz.resampled(21), clim=clim, vmag=vmag, vfreq=vfreq,
-                    save_png=True, dir_fname=output_dir+'vel_ana.png', clip_angle=135, show_arrows=False, cpos='yz')
-
-    vis.save_colorbar(colormap=cmc.lapaz.resampled(21), cb_bounds=None, vmin=clim[0], vmax=clim[1], figsize_cb=(5, 5), primary_fs=18,
-                      cb_orient='horizontal', cb_axis_label='Velocity', cb_label_xpos=0.5, cb_label_ypos=-2.05, fformat='pdf',
-                      output_path=output_dir, fname='v_ana')
-
-# %%
-clim = [-0.1, 0.1]
-if uw.mpi.size == 1 and analytical and visualize:
-    vis.plot_scalar(mesh, p_ana.sym, 'p_ana', cmap=cmc.vik.resampled(41), clim=clim, save_png=True, clip_angle=135,
-                    dir_fname=output_dir+'p_ana.png', cpos='yz')
-
-    vis.save_colorbar(colormap=cmc.vik.resampled(41), cb_bounds=None, vmin=clim[0], vmax=clim[1], figsize_cb=(5, 5), primary_fs=18,
-                      cb_orient='horizontal', cb_axis_label='Pressure', cb_label_xpos=0.5, cb_label_ypos=-2.0, fformat='pdf',
-                      output_path=output_dir, fname='p_ana')
-
-# %%
-# Create Stokes object
 stokes = Stokes(mesh, velocityField=v_uw, pressureField=p_uw)
 stokes.constitutive_model = uw.constitutive_models.ViscousFlowModel
 stokes.constitutive_model.Parameters.viscosity = 1.0
 stokes.saddle_preconditioner = 1.0
 
-# %%
-# defining rho fn and bodyforce term
-y_lm_real = sympy.sqrt((2*l + 1)/(4*sympy.pi) * sympy.factorial(l - m)/sympy.factorial(l + m)) * sympy.cos(m*phi_uw) * sympy.assoc_legendre(l, m, sympy.cos(th_uw))
+stokes.bodyforce = rho * (-1.0 * unit_rvec)
 
-gravity_fn = -1.0 * unit_rvec # gravity
+stokes.add_essential_bc(sympy.Matrix([0., 0., 0.]), mesh.boundaries.Upper.name)
+stokes.add_essential_bc(sympy.Matrix([0., 0., 0.]), mesh.boundaries.Lower.name)
 
-if smooth:
-    rho = ((r_uw/r_o)**k) * y_lm_real
-    stokes.bodyforce = rho*gravity_fn
-
-# %%
-if analytical:
-    with mesh.access(rho_ana):
-        rho_ana.data[:] = np.c_[uw.function.evaluate(rho, rho_ana.coords)]
-
-# %%
-# boundary conditions
-v_diff =  v_uw.sym - v_ana.sym
-stokes.add_natural_bc(vel_penalty*v_diff, mesh.boundaries.Upper.name)
-stokes.add_natural_bc(vel_penalty*v_diff, mesh.boundaries.Lower.name)
-
-# %%
-# plotting analytical rho
-clim = [-0.4, 0.4]
-
-if uw.mpi.size == 1 and visualize:
-    vis.plot_scalar(mesh, -rho_ana.sym, 'Rho', cmap=cmc.roma.resampled(31), clim=clim, save_png=True,
-                    dir_fname=output_dir+'rho_ana.png', clip_angle=135, cpos='yz')
-
-    vis.save_colorbar(colormap=cmc.roma.resampled(31), cb_bounds=None, vmin=clim[0], vmax=clim[1], figsize_cb=(5, 5), primary_fs=18,
-                      cb_orient='horizontal', cb_axis_label='Rho', cb_label_xpos=0.5, cb_label_ypos=-2.0, fformat='pdf',
-                      output_path=output_dir, fname='rho_ana')
-
-# %%
-# Stokes settings
+# Convergence tolerance. Unlike poisson-scaling.py, this campaign is FIXED-TOLERANCE,
+# not fixed-iteration: every job solves to the same tolerance and we report both wall
+# time and iteration count, so parallel efficiency (time per iteration) and algorithmic
+# scalability (iteration count vs. nprocs) can be separated.
+#
+# A fixed-iteration setup is not viable here. UW3's Stokes tolerance setter derives
+#     fieldsplit_pressure_ksp_rtol = tolerance * 0.1
+#     fieldsplit_velocity_ksp_rtol = tolerance * 0.033
+# from this value (_INNER_RTOL_MARGIN in petsc_generic_snes_solvers.pyx), and both
+# inner KSPs default to ksp_max_it = 200. An unreachable tolerance (e.g. the 1e-50
+# poisson-scaling.py uses to pin its iteration count) means neither inner solve ever
+# converges, so each runs all 200 iterations — and because the Schur complement is
+# applied matrix-free, every pressure iteration triggers a full velocity solve. That
+# is ~10 x 200 x 200 multigrid W-cycles per solve, independent of mesh size.
+#
+# Guard rather than clamp: a tolerance below double precision is always a config error
+# (usually UW_SOL_TOLERANCE left at the 1e-50 poisson uses), and the failure mode is a
+# job that hangs until it burns its whole walltime. Fail in seconds instead.
+if stokes_tol < 1e-12:
+    raise ValueError(
+        f"uw_tol={stokes_tol:g} is below double precision and cannot be reached by the "
+        f"inner fieldsplit solves, which would each run their full 200 iterations and "
+        f"hang the job. Stokes is a fixed-tolerance campaign — set UW_SOL_TOLERANCE=1e-8. "
+        f"(poisson-scaling.py uses 1e-50 deliberately; that trick does not transfer here.)"
+    )
 stokes.tolerance = stokes_tol
-stokes.petsc_options["ksp_monitor"] = None
 
-stokes.petsc_options["snes_type"] = "newtonls"
-stokes.petsc_options["ksp_type"] = "fgmres"
+# The tolerance setter derives the inner fieldsplit tolerances as tol*0.1 (pressure) and
+# tol*0.033 (velocity) — at tol=1e-8 that is 1e-9 and 3.3e-10, which is not inexact by any
+# reading, despite the UW3 source describing the inner solves as "deliberately inexact".
+# Tight inner solves mean many inner Krylov iterations, and each one costs a global
+# MPI_Allreduce: the BASE=5 container campaign showed ~5500 reductions per solve against
+# Poisson's 189, which is what caps parallel efficiency at 0.36 by 125 cores.
+#
+# A flexible outer method (fgmres) tolerates sloppy preconditioning by design, so loosening
+# these should cut reductions without changing the outer iteration count. Must be set AFTER
+# stokes.tolerance, which writes them.
+# Setting the fieldsplit rtols directly does NOT work on the v3.1.0 container: solve()
+# round-trips self.tolerance just before setFromOptions() and re-derives them (UW3 issue
+# #477, fixed upstream but not in this image). Verified 2026-08-07 — the readback showed
+# 0.001 -> 1e-09. Overriding _INNER_RTOL_MARGIN on the instance does not work either; the
+# container reads its margins from the class.
+#
+# So drive the derivation instead of fighting it: the container computes
+# pressure_rtol = tolerance * 0.1, so tolerance = inner_rtol / 0.1 produces the wanted
+# inner tolerance THROUGH its own mechanism, which survives the round-trip.
+#
+# This is safe here because stokes.tolerance does not actually govern outer convergence in
+# this configuration: ksp_rtol is unset (PETSc default 1e-5 applies) and snes_rtol is
+# satisfied trivially — a linear Stokes solve drops the residual ~2e-10 in one iteration,
+# far inside any of these thresholds. Confirm via ksp_its_total == 1 and ksp_reason.
+inner_rtol = params.uw_inner_rtol
+if inner_rtol > 0:
+    _CONTAINER_PRESSURE_MARGIN = 0.1
+    stokes.tolerance = inner_rtol / _CONTAINER_PRESSURE_MARGIN
+    uw.pprint(
+        f"inner fieldsplit rtol target {inner_rtol:g} "
+        f"via stokes.tolerance = {stokes.tolerance:g}"
+    )
 
-# stokes.petsc_options.setValue("fieldsplit_velocity_pc_type", "mg")
-stokes.petsc_options.setValue("fieldsplit_velocity_pc_mg_type", "kaskade")
+stokes.petsc_options["snes_max_it"] = 3      # linear problem: converges in 1 Newton step
+stokes.petsc_options["ksp_monitor"]          = None
+stokes.petsc_options["ksp_converged_reason"] = None
+stokes.petsc_options["snes_type"]            = "newtonls"
+stokes.petsc_options["ksp_type"]             = "fgmres"
+
+stokes.petsc_options.setValue("fieldsplit_velocity_pc_mg_type",       "kaskade")
 stokes.petsc_options.setValue("fieldsplit_velocity_pc_mg_cycle_type", "w")
-
-stokes.petsc_options["fieldsplit_velocity_mg_coarse_pc_type"] = "svd"
-
-stokes.petsc_options[f"fieldsplit_velocity_ksp_type"] = "fcg"
-stokes.petsc_options[f"fieldsplit_velocity_mg_levels_ksp_type"] = "chebyshev"
-stokes.petsc_options[f"fieldsplit_velocity_mg_levels_ksp_max_it"] = 5
-stokes.petsc_options[f"fieldsplit_velocity_mg_levels_ksp_converged_maxits"] = None
-
-# # gasm is super-fast ... but mg seems to be bulletproof
-# # gamg is toughest wrt viscosity
-# stokes.petsc_options.setValue("fieldsplit_pressure_pc_type", "gamg")
-# stokes.petsc_options.setValue("fieldsplit_pressure_pc_mg_type", "additive")
-# stokes.petsc_options.setValue("fieldsplit_pressure_pc_mg_cycle_type", "v")
-
-# mg, multiplicative - very robust ... similar to gamg, additive
-stokes.petsc_options.setValue("fieldsplit_pressure_pc_type", "mg")
-stokes.petsc_options.setValue("fieldsplit_pressure_pc_mg_type", "multiplicative")
+stokes.petsc_options["fieldsplit_velocity_mg_coarse_pc_type"]              = "redundant"
+stokes.petsc_options["fieldsplit_velocity_ksp_type"]                       = "fcg"
+stokes.petsc_options["fieldsplit_velocity_mg_levels_ksp_type"]             = "chebyshev"
+stokes.petsc_options["fieldsplit_velocity_mg_levels_ksp_max_it"]           = 5
+stokes.petsc_options["fieldsplit_velocity_mg_levels_ksp_converged_maxits"] = None
+stokes.petsc_options.setValue("fieldsplit_pressure_pc_type",          "mg")
+stokes.petsc_options.setValue("fieldsplit_pressure_pc_mg_type",       "multiplicative")
 stokes.petsc_options.setValue("fieldsplit_pressure_pc_mg_cycle_type", "v")
 
-# set max iterations for scaling tests
+# A cap, not a target: the solve converges on tolerance well inside this. It exists so
+# a job that stops converging fails fast instead of burning its walltime.
+#
+# Set UW_MAX_ITS generously for this campaign (~100). If the cap binds, the solve did
+# NOT converge and the data point is invalid — ksp_reason in run_info.json records
+# DIVERGED_ITS when that happens, so check it before trusting a run.
 if max_it > 0:
     stokes.petsc_options["ksp_max_it"] = max_it
-    stokes.petsc_options["snes_max_it"] = max_it
 
-# %%
+stage.pop()
+
+# Snapshot the options BEFORE solving. Comparing this against the after-solve readback
+# separates "our value never landed" from "solve() overwrote it" — UW3's solve() pushes
+# its own snes_max_it and (in versions predating issue #477) re-derives the inner
+# fieldsplit tolerances from self.tolerance just before setFromOptions().
+options_before = report_effective_options(stokes, "before first_solve")
+
+# --------------------------------------------------------------------------- #
+# STAGE: first_solve  (includes JIT compilation of residuals/Jacobians)       #
+# --------------------------------------------------------------------------- #
+stage = PETSc.Log.Stage("first_solve"); stage.push()
+
 stokes.solve(verbose=True, debug=False)
 
-# %%
+stage.pop()
+solver_stats = {"first_solve": capture_solver_stats(stokes)}
+effective_options = report_effective_options(stokes, "after first_solve")
 
-if timing:
-    uw.timing.stop()
+overwritten = {k: (options_before.get(k), effective_options.get(k))
+               for k in _OPTIONS_TO_REPORT
+               if options_before.get(k) != effective_options.get(k)}
+if overwritten:
+    uw.pprint("!!! options changed by solve() — these are NOT what was configured:")
+    for k, (before, after) in overwritten.items():
+        uw.pprint(f"    {k:34s} {before} -> {after}")
 
-    module_timing_data_orig = uw.timing.get_data(group_by="routine")
-    if uw.mpi.rank == 0:
-        print(module_timing_data_orig)
+# --------------------------------------------------------------------------- #
+# STAGE: steady_solves  (JIT-warm re-solve — isolates pure solver cost)       #
+# Reset to zero so iteration count matches first_solve.                        #
+# --------------------------------------------------------------------------- #
+stage = PETSc.Log.Stage("steady_solves"); stage.push()
 
-    filename = f"timing"
+v_uw.data[:] = 0.0
+p_uw.data[:] = 0.0
+stokes.solve(verbose=True, debug=False)
 
-    import json
+stage.pop()
+solver_stats["steady_solves"] = capture_solver_stats(stokes)
 
-    if module_timing_data_orig:
-        module_timing_data = {}
-        for key, val in module_timing_data_orig.items():
-            module_timing_data[key[0]] = val
+# --------------------------------------------------------------------------- #
+# Run metadata (rank 0)                                                        #
+# --------------------------------------------------------------------------- #
+# Collective — every rank must call this, so it sits outside the rank-0 block below.
+placement = rank_placement()
 
-        with open(f"{output_dir}/{filename}.json", "w") as fp:
-            json.dump(module_timing_data, fp, sort_keys = True, indent = 4)
+if uw.mpi.rank == 0:
+    with open(f"{output_dir}/run_info.json", "w") as fp:
+        json.dump({
+            "model": "stokes-scaling",
+            "res": res,
+            "nprocs": uw.mpi.size,
+            "scaling": scaling,
+            "tolerance_requested": stokes_tol,
+            "tolerance_effective": stokes.tolerance,   # differs when inner_rtol is set
+            "inner_rtol": inner_rtol if inner_rtol > 0 else None,
+            "effective_options": effective_options,
+            "placement": placement,
+            "solver_stats": solver_stats,
+        }, fp, indent=4)
 
-    uw.timing.print_table(group_by = "routine", output_file = f"{output_dir}/{filename}.txt", display_fraction = 1.00)
-
-
-# %%
-# Null space evaluation
-I0 = uw.maths.Integral(mesh, v_theta_phi_fn_xyz.dot(v_uw.sym))
-norm = I0.evaluate()
-
-I0.fn = v_theta_phi_fn_xyz.dot(v_theta_phi_fn_xyz)
-vnorm = I0.evaluate()
-# print(norm/vnorm, vnorm)
-
-with mesh.access(v_uw):
-    dv = uw.function.evaluate(norm * v_theta_phi_fn_xyz, v_uw.coords) / vnorm
-    v_uw.data[...] -= dv
-
-## %%
-## compute error
-if analytical:
-    with mesh.access(v_uw, p_uw, v_err, p_err):
-
-        def get_error(_var_err, _var_uw, _r_int, _soln_above, _soln_below):
-            # get error in numerical solution
-            r = uw.function.evalf(r_uw, _var_err.coords)
-            for i, coord in enumerate(_var_err.coords):
-                if r[i]>_r_int:
-                    _var_err.data[i] = _var_uw.data[i] - _soln_above(coord)
-                else:
-                    _var_err.data[i] = _var_uw.data[i] - _soln_below(coord)
-
-        # error in velocities
-        get_error(v_err, v_uw, r_int, soln_above.velocity_cartesian, soln_below.velocity_cartesian)
-
-        # error in pressure
-        get_error(p_err, p_uw, r_int, soln_above.pressure_cartesian, soln_below.pressure_cartesian)
-#
-## %%
-## computing L2 norm
-if analytical:
-    with mesh.access(v_err, p_err, p_ana, v_ana):
-        v_err_I = uw.maths.Integral(mesh, v_err.sym.dot(v_err.sym))
-        v_ana_I = uw.maths.Integral(mesh, v_ana.sym.dot(v_ana.sym))
-        v_err_l2 = np.sqrt(v_err_I.evaluate())/np.sqrt(v_ana_I.evaluate())
-
-        p_err_I = uw.maths.Integral(mesh, p_err.sym.dot(p_err.sym))
-        p_ana_I = uw.maths.Integral(mesh, p_ana.sym.dot(p_ana.sym))
-        p_err_l2 = np.sqrt(p_err_I.evaluate())/np.sqrt(p_ana_I.evaluate())
-
-        if uw.mpi.rank == 0:
-            print('Relative error in velocity in the L2 norm: ', v_err_l2)
-            print('Relative error in pressure in the L2 norm: ', p_err_l2)
+# --------------------------------------------------------------------------- #
+# Timing output                                                                #
+# --------------------------------------------------------------------------- #
+uw.mpi.barrier()
+uw.timing.print_table(filename=f"{output_dir}/timing.csv")
+uw.timing.print_table(filename=f"{output_dir}/timing.txt")
+uw.pprint(f"Timing written to {output_dir}/timing.csv")
