@@ -52,8 +52,9 @@ control neither confirms nor refutes it, for three reasons found only by reading
    `is_pure_sympy_expression()` routes it to a lambdify fast path
    (`functions_unit_system.py:157`). The first test measured arithmetic.
 2. `mode="default"` is DMInterp+RBF, approximate **by design**, so error is expected.
-3. Evaluating at a variable's own coordinates is the pathological case, not the cheap one —
-   and SLCN's interpolation is the *interior* case, which scales acceptably.
+3. ~~Evaluating at a variable's own coordinates is the pathological case, not the cheap one~~
+   — **itself retracted below**; it is the cheap case, and the "pathological" reading was the
+   barrier artefact.
 
 **The advdiff SLCN result itself is untouched.** It measured real wall time in a real
 timestep loop with solver work pinned.
@@ -152,3 +153,36 @@ was as slow as res=5.
 Found by `gdb -p <pid> -batch -ex bt` on a hung run. `cache=False` remains a real bug worth
 reporting; it was not this one. Lesson: get a stack trace before reasoning forward from a
 plausible culprit.
+
+### "`evaluate` at a variable's own coordinates collapses" — retracted
+
+**Was:** finding 7 — efficiency 0.05 by 125 ranks, 10× the cost of interior probes.
+**Now:** **0.80 to 343 ranks**, cheaper than interior probes (26.0 vs 44.2 µs/pt). No collapse.
+
+No barrier between stages. `eval_nodal` ran first and its first collective
+(`Mesh.get_max_radius`) absorbed the ranks' arrival skew. `eval_offnode` ran second on
+synchronised ranks and is unchanged between campaigns (0.97–1.00×) — the control. The skew is
+all JIT: `jit_warmup_sync` 4.76 s, `mesh_setup_sync` and `field_setup_sync` 0.00 (#547).
+Point 3 of the SLCN retraction above goes with it. Not for upstream — #551 covers it.
+
+### Other stage curves audited — none affected
+
+The artefact needs a stage that ends without a collective. In the largest run of every
+campaign (Poisson 2197, Stokes 1000/125, advdiff 1000, checkpoint 1000) every stage is
+uniform across ranks to ≤0.27 s, so every stage ended on one. Confirmed on advdiff by
+re-running with barriers: solver stages within 1%, `_sync` total 0.01 s of 3791 s. **v1
+stage curves stand.**
+
+### Poisson `mesh_setup`: 2329 of 5621 s was our `.msh` choice
+
+**Was:** mesh distribution dominates (finding 1).
+**Now:** 2329 s is `DMPlexCrFromFile`, the serial Gmsh→HDF5 conversion `Mesh()` runs on a
+`.msh`. We cached the `.msh`; caching the `.msh.h5` skips it — advdiff 657.8 → 279.1 s,
+checkpoint 670 → 281 s at 343 ranks, solver unchanged. `DMPlexDistribute` (1547 s) remains.
+Harness error, not a UW3 defect. Poisson not re-run; the power law includes the serial term.
+
+### Infrastructure: benchmark v2
+
+Timed barrier after every stage; mesh read from `.msh.h5`; per-event `time_max/min/mean/
+n_working` exported (rank-0 time cannot tell one rank working from all ranks waiting).
+Stages are not comparable across v1/v2; totals are.
