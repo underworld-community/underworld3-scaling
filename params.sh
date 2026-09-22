@@ -1,10 +1,10 @@
 #!/bin/bash
-export JOBS="1 2 3 4 5"                           # 3D multipliers: NTASKS=i^3, res=BASE*i
-export RUN_INDICES="1 2 3"                        # repetitions for averaging
-export WALLTIME="02:00:00"
+export JOBS="1 2 7"                               # subset probe: 1, 8, 343 ranks
+export RUN_INDICES="1 2"                          # repetitions for averaging
+export WALLTIME="03:00:00"
 
 export SCALING_TYPE=1               # 1=weak, 2=strong
-export SCALING_BASE=8
+export SCALING_BASE=24
 export PBSTASK_MULT=1               # multiplier for requested PBSTASKS so you can increase memory request (e.g. use 384 GB, but you only need < 48 procs)
 
 export UW_DIM=3                     # 2 or 3
@@ -13,10 +13,10 @@ export UW_SOL_TOLERANCE=1e-50       # tolerance to use
 
 # Space-separated list of model filenames (w/o extension) to run in sequence.
 # The launcher will submit one job per model per JOBS x RUN_INDICES combination.
-export UW_MODELS="poisson-scaling"
-export UW_MODEL="poisson-scaling"   # fallback / single-model override (set by launcher per iteration)
+export UW_MODELS="advdiff-scaling"
+export UW_MODEL="advdiff-scaling"   # fallback / single-model override (set by launcher per iteration)
 
-export UW_NAME="uw3_Jul2026_baremetal_BASE8"  # uw version name label
+export UW_NAME="uw3_Sep2026_container_advdiff_v2"  # uw version name label
 
 # Base output path — replaces the hardcoded /scratch/el06/jg0883/ in Python scripts.
 export OUTPUT_BASE="/scratch/el06/jg0883"
@@ -33,7 +33,7 @@ export QUEUE="normal"               # normal or express
 # Set to 1 to run jobs inside the Singularity container (gadi_container_go.sh)
 # instead of the baremetal environment (gadi_baremetal_go.sh).
 # Requires: pip install --target=/scratch/el06/jg0883/uw3-extra-pkgs assess  (once)
-export USE_CONTAINER=0
+export USE_CONTAINER=1
 
 # Test style - UW_MAX_ITS:
 #   For vep-scaling / advdiff-scaling: number of timesteps (>= 2 recommended so first_solve

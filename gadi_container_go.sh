@@ -53,6 +53,12 @@ echo ${JOB_IDX}
 echo ${RUN_IDX}
 echo ""
 
+# BLAS is pinned to one thread per rank below. MPI already owns every core, so a
+# multi-threaded BLAS oversubscribes them and makes per-rank timings vary for reasons
+# unrelated to scaling. Prescribed by UW3 docs/advanced/performance.md (#635, 3 Sep).
+# Set inside the container's bash -c rather than exported here, so it does not depend
+# on Singularity's environment passthrough.
+#
 # Rank placement. Default (empty) lets OpenMPI pack densely — 48 ranks to a node —
 # which is what PBS memory limits are enforced against and what makes memory bandwidth
 # per rank vary across a weak-scaling sweep (1, 8, 27, 48, 48 ranks/node for i^3 job
@@ -66,6 +72,7 @@ mpiexec ${UW_MPI_MAP:-} -n ${NTASKS} singularity exec \
     bash -c \
     "LD_LIBRARY_PATH=${HOST_MPI_LIB}:${HOST_OMPI_RT}:${HOST_UCX}:${HOST_UCC}:${HOST_HCOLL}:/opt/pbs/default/lib:/half-root/usr/lib64:/half-root/lib64:\${LD_LIBRARY_PATH} \
      PYTHONPATH=${EXTRA_PKGS}:\${PYTHONPATH} \
+     OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 \
      python3 ${UW_MODEL}.py \
      -uw_scaling ${TYPE} \
      -uw_res ${UW_RESOLUTION} \

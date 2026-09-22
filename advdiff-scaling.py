@@ -201,15 +201,19 @@ if uw.mpi.rank == 0:
     os.makedirs(mesh_cache, exist_ok=True)
 uw.mpi.barrier()
 
-cache_file = f"{mesh_cache}/UnstructuredSimplexBox_res{res}.msh"
+# Prefer the cached .msh.h5 over the .msh. Mesh() dispatches on extension: .msh routes
+# through a SERIAL rank-0 gmsh->h5 conversion (DMPlexCrFromFile) before the parallel read,
+# and that conversion is the dominant serial event in this campaign — 13% of the 1000-rank
+# run. Weak scaling grows the total mesh with the rank count, so it is an Amdahl term that
+# worsens the further the sweep goes. Measured on checkpoint at 343 ranks: 670 -> 281 s.
+#
+# The .h5 is read IN PLACE. The copy exists only for the .msh path, where _gmsh_to_h5 writes
+# next to its input so concurrent jobs sharing one cached .msh race on the same target
+# (upstream #565). Reading a .h5 mutates nothing, so there is no race to avoid.
+cache_msh = f"{mesh_cache}/UnstructuredSimplexBox_res{res}.msh"
+cache_h5  = f"{cache_msh}.h5"
 
-if os.path.exists(cache_file):
-    import shutil
-    local_msh = f"{output_dir}/mesh.msh"
-    if uw.mpi.rank == 0:
-        shutil.copy2(cache_file, local_msh)
-    uw.mpi.barrier()
-
+if os.path.exists(cache_h5) or os.path.exists(cache_msh):
     class _boundaries_3D(Enum):
         Bottom = 11; Top = 12; Right = 13; Left = 14; Front = 15; Back = 16
 
@@ -219,8 +223,18 @@ if os.path.exists(cache_file):
         Front  = sympy.Matrix([0, 1, 0]); Back  = sympy.Matrix([0, 1, 0])
 
     from underworld3.coordinates import CoordinateSystemType
+
+    if os.path.exists(cache_h5):
+        mesh_file = cache_h5
+    else:
+        import shutil
+        mesh_file = f"{output_dir}/mesh.msh"
+        if uw.mpi.rank == 0:
+            shutil.copy2(cache_msh, mesh_file)
+        uw.mpi.barrier()
+
     mesh = uw.discretisation.Mesh(
-        local_msh,
+        mesh_file,
         degree=1,
         qdegree=qdeg,
         boundaries=_boundaries_3D,
@@ -236,7 +250,7 @@ else:
         maxCoords=(1., 1., 1.),
         cellSize=1.0 / res,
         qdegree=qdeg,
-        filename=cache_file,
+        filename=cache_msh,
     )
 
 T     = uw.discretisation.MeshVariable("T",   mesh, 1, degree=udeg)
@@ -249,6 +263,26 @@ if uw.mpi.rank == 0:
 mesh.dm.view()
 
 stage.pop()
+
+# EVERY STAGE IS FOLLOWED BY A TIMED BARRIER IN ITS OWN <name>_sync STAGE.
+#
+# stage.pop() is a LOCAL call, so without this a stage measures only its own duration while
+# ranks enter and leave it at different wall-clock times. The imbalance then surfaces inside
+# whichever later stage holds the next collective, and is billed there — which is what
+# produced the retracted 2026-08 eval_nodal result in checkpoint-scaling.py.
+#
+# Splitting work from wait gives both numbers instead of one contaminated one: <name> is the
+# slowest rank's work, <name>_sync is the spread in arrival, and the two sum to the phase's
+# true wall-clock. It also makes every stage START synchronised, so each stage's own number
+# is clean and comparable across the sweep.
+#
+# Cost: barriers forbid overlap, so the barriered total is pessimistic against a real run.
+# Check the _sync total against runtime — it was 0.9% at 343 ranks on checkpoint, but a
+# barrier is O(log N) at best, so verify rather than assume at the top of the sweep.
+stage = PETSc.Log.Stage("mesh_setup_sync"); stage.push()
+uw.mpi.barrier()
+stage.pop()
+
 _record_rss("mesh_setup", rss_before, _rss())
 
 # --------------------------------------------------------------------------- #
@@ -310,6 +344,11 @@ T.data[:, 0] = uw.function.evaluate(u_ana_expr, T.coords).reshape(-1)
 dt = 0.5 * (1.0 / res)
 
 stage.pop()
+
+stage = PETSc.Log.Stage("solver_setup_sync"); stage.push()
+uw.mpi.barrier()
+stage.pop()
+
 _record_rss("solver_setup", rss_before, _rss())
 
 # --------------------------------------------------------------------------- #
@@ -327,6 +366,13 @@ stage = PETSc.Log.Stage("first_solve"); stage.push()
 adv_diff.solve(timestep=dt, zero_init_guess=False)
 
 stage.pop()
+
+# Barrier goes immediately after the pop, ahead of the stats capture, so nothing between
+# the two can absorb the skew this stage is meant to expose.
+stage = PETSc.Log.Stage("first_solve_sync"); stage.push()
+uw.mpi.barrier()
+stage.pop()
+
 solver_stats = {"first_solve": capture_solver_stats(adv_diff)}
 effective_options = report_effective_options(adv_diff, "after first_solve")
 _record_rss("first_solve", rss_before, _rss())
@@ -345,6 +391,11 @@ for step in range(n_steady):
     adv_diff.solve(timestep=dt, zero_init_guess=False)
 
 stage.pop()
+
+stage = PETSc.Log.Stage("steady_solves_sync"); stage.push()
+uw.mpi.barrier()
+stage.pop()
+
 # getLinearSolveIterations() accumulates over the SNES object's whole lifetime, so
 # subtract the first_solve total to get the iterations spent in this stage alone.
 solver_stats["steady_solves"] = capture_solver_stats(

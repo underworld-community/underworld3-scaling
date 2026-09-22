@@ -20,8 +20,12 @@ echo ""
 export TIME_LAUNCH_MPI=`date +%s%N | cut -b1-13`
 # See gadi_container_go.sh for why UW_MPI_MAP exists — default packs 48 ranks/node,
 # "--map-by node" distributes round-robin so placement stops confounding scaling runs.
+# One BLAS thread per rank: MPI already owns every core, so a threaded BLAS
+# oversubscribes them and makes per-rank timings vary independently of scaling.
+# Prescribed by UW3 docs/advanced/performance.md (#635, 3 Sep).
 mpiexec ${UW_MPI_MAP:-} -x LD_PRELOAD=libmpi.so -n ${NTASKS} bash -c \
-    "TIME_LAUNCH_PYTHON=\`date +%s%N | cut -b1-13\` python3 ${UW_MODEL}.py \
+    "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 \
+     TIME_LAUNCH_PYTHON=\`date +%s%N | cut -b1-13\` python3 ${UW_MODEL}.py \
      -uw_scaling ${TYPE} \
      -uw_res ${UW_RESOLUTION} \
      -uw_tol ${UW_SOL_TOLERANCE} \

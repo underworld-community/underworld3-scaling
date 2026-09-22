@@ -49,6 +49,21 @@ do
         do
             export RUN_IDX="${j}"
 
+            # Results land in ${OUTPUT_BASE}/${NAME}/<model>_out/..._job<i>_iter<j>, and NAME
+            # is keyed on UW_NAME. Leaving UW_NAME unchanged between rounds silently reuses
+            # the previous campaign's directory -- that is how jobs 1, 2 and 7 of a finished
+            # round were overwritten, with nothing visible until the queue had already run.
+            # Adding new jobs to an existing campaign is legitimate, so refuse only when THIS
+            # job/iter already has output.
+            clash=$(find "${OUTPUT_BASE:-/nonexistent}/${NAME}" -type d \
+                         -name "*_job${JOB_IDX}_iter${RUN_IDX}" 2>/dev/null | head -1)
+            if [ -n "${clash}" ] && [ "${UW_ALLOW_OVERWRITE:-0}" != "1" ]; then
+                echo "ERROR: ${clash}"
+                echo "       already exists -- this run would overwrite it."
+                echo "       Bump UW_NAME in params.sh, or set UW_ALLOW_OVERWRITE=1 to proceed."
+                exit 1
+            fi
+
             if (($SCALING_TYPE==1)); then   # weak
                 export UW_RESOLUTION="$((${SCALING_BASE} * ${i}))"
                 if (($UW_DIM==2)); then
