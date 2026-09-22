@@ -24,8 +24,16 @@ from collections import defaultdict
 
 
 def _read_run(run_dir):
-    """One run: stage wall times (max over ranks) and per-event count spread."""
-    stages, events = {}, defaultdict(lambda: {"max": 0, "min": None, "time": 0.0})
+    """One run: stage wall times (max over ranks), and per-event count AND time spread.
+
+    Time statistics across ranks are what distinguish one rank working from every rank
+    waiting, and rank 0 alone cannot tell them apart. n_working (ranks above half the max)
+    is the classifier; it needs the max before it can be counted, hence the second pass.
+    """
+    stages = {}
+    events = defaultdict(lambda: {"max": 0, "min": None, "time": 0.0,
+                                  "time_max": 0.0, "time_min": None,
+                                  "time_sum": 0.0, "nranks": 0})
     path = os.path.join(run_dir, "timing.csv")
     if not os.path.exists(path):
         return None
@@ -64,8 +72,34 @@ def _read_run(run_dir):
                 e = events[(stage, event)]
                 e["max"] = max(e["max"], count)
                 e["min"] = count if e["min"] is None else min(e["min"], count)
+                e["time_max"] = max(e["time_max"], tsec)
+                e["time_min"] = tsec if e["time_min"] is None else min(e["time_min"], tsec)
+                e["time_sum"] += tsec
+                e["nranks"] += 1
                 if rank == 0:
                     e["time"] = tsec
+
+    # Re-read rather than hold one time per rank per event in memory: at 2197 ranks that is
+    # ~3900 events x 2197 ranks of floats, and the export runs once per round.
+    working = defaultdict(int)
+    with open(path) as fh:
+        for raw in fh:
+            f = raw.split(",")
+            if len(f) < 9 or f[0] in ("Stage Name", "Main Stage") or f[1] == "summary":
+                continue
+            try:
+                tsec = float(f[4])
+            except ValueError:
+                continue
+            e = events.get((f[0], f[1]))
+            if e and e["time_max"] > 0.0 and tsec > 0.5 * e["time_max"]:
+                working[(f[0], f[1])] += 1
+
+    for key, e in events.items():
+        e["time_mean"] = e["time_sum"] / e["nranks"] if e["nranks"] else 0.0
+        e["n_working"] = working.get(key, 0)
+        if e["time_min"] is None:
+            e["time_min"] = 0.0
 
     # poisson-scaling.py writes errors.json; the others write run_info.json. Both carry
     # model/res/nprocs, so either will do.
@@ -157,10 +191,17 @@ def _load_from_export(campaign):
                             "flop": float(r["flop"]),
                         }
                     else:
+                        # Rounds exported before benchmark v2 have no time columns; a
+                        # figure that asks for them on old data should get 0, not a
+                        # KeyError, so the archive stays readable.
                         runs[key]["events"][(r["stage"], r["event"])] = {
                             "max": int(r["count_max"]),
                             "min": int(r["count_min"]),
                             "time": float(r["time_rank0"]),
+                            "time_max": float(r.get("time_max") or 0.0),
+                            "time_min": float(r.get("time_min") or 0.0),
+                            "time_mean": float(r.get("time_mean") or 0.0),
+                            "n_working": int(r.get("n_working") or 0),
                         }
 
         grouped = defaultdict(list)

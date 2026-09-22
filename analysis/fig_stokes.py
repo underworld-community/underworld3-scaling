@@ -1,8 +1,8 @@
 """Stokes weak scaling — per-stage cost and efficiency, and how configurations compare.
 
 Layout (3x2):
-  row 1   inner rtol 1e-6 (recommended)   — cost by stage | efficiency by stage
-  row 2   inner rtol 1e-9 (UW3 default)   — cost by stage | efficiency by stage
+  row 1   stokes.tolerance = 1e-5 (recommended)  — cost by stage | efficiency by stage
+  row 2   stokes.tolerance = 1e-8 (UW3 default)  — cost by stage | efficiency by stage
   row 3   four configurations overlaid    — first_solve efficiency | steady_solves efficiency
 
 Rows 1 and 2 are the same axes for two tolerance settings, so the comparison is read
@@ -11,12 +11,16 @@ nearly identical. That is the point. Tolerance is a CONSTANT-FACTOR tax, not a s
 defect, and a plot of cost alone would only show the unsurprising fact that a tighter
 tolerance takes longer.
 
-NOTE ON WHAT "inner rtol 1e-6" MEANS HERE. The rows differ in the whole tolerance chain, not
-just the inner solve. UW3 derives the inner fieldsplit tolerances from the outer one
-(pressure x 0.1, velocity x 0.033) and #477 makes solve() overwrite any instance-level
-override in the v3.1.0 container, so the only way to reach a given inner value was to move
-the outer tolerance: outer 1e-8 -> inner 1e-9, outer 1e-5 -> inner 1e-6. Achieved residuals
-are 2.6e-11 and 2.2e-8 respectively.
+WHAT WAS ACTUALLY VARIED. One knob: `stokes.tolerance`. Its setter derives everything else in
+fixed proportion — snes_rtol directly, ksp_atol x1e-6, fieldsplit pressure x0.1, velocity
+x0.033 — and enables Eisenstat-Walker, so the outer KSP has no fixed rtol at all. The
+campaign directories are named after the resulting inner pressure value (default / 1e-6 /
+1e-3) for historical reasons; that names an intention, not a mechanism.
+
+This is therefore a ONE-PARAMETER SWEEP, not a study of the inner solve. Isolating the inner
+tolerance needs fieldsplit_*_ksp_rtol set independently, which #477 prevents in v3.1.0:
+solve() re-derives them from tolerance immediately before PETSc reads them. Achieved
+residuals are 2.6e-11 (tol 1e-8) and 2.2e-8 (tol 1e-5).
 
 Row 3 asks the separate question of whether any configuration scales differently: the two
 tolerances, plus BASE=10 packed against BASE=10 spread (`--map-by node`), for the initial
@@ -43,16 +47,21 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import figdata
 import figstyle as fs
 
+# Labelled by the knob that was actually turned. `stokes.tolerance` is the only thing set;
+# snes_rtol, ksp_atol and both fieldsplit rtols all follow from it in fixed proportion, so
+# naming a row after its inner value would name an intention rather than a mechanism. The
+# campaign directories keep their original names (default / 1e-6 / 1e-3, after the inner
+# pressure value) — those are data identifiers, not claims.
 ROWS = [
-    ("weak-scaling-2026-stokes-BASE5-3way/1e-6",    "inner rtol 1e-6 (recommended)"),
-    ("weak-scaling-2026-stokes-BASE5-3way/default", "inner rtol 1e-9 (UW3 default)"),
+    ("weak-scaling-2026-stokes-BASE5-3way/1e-6",    "tolerance 1e-5, recommended (inner 1e-6)"),
+    ("weak-scaling-2026-stokes-BASE5-3way/default", "tolerance 1e-8, UW3 default (inner 1e-9)"),
 ]
 
-# Four configurations for the bottom row. BASE=10 runs are at inner rtol 1e-6, so the
+# Four configurations for the bottom row. BASE=10 runs are at tolerance 1e-5, so the
 # tolerance lever is held fixed across the placement pair.
 CONFIGS = [
-    ("weak-scaling-2026-stokes-BASE5-3way/1e-6",    "C0", "BASE=5, 1e-6"),
-    ("weak-scaling-2026-stokes-BASE5-3way/default", "C3", "BASE=5, 1e-9"),
+    ("weak-scaling-2026-stokes-BASE5-3way/1e-6",    "C0", "BASE=5, tol 1e-5"),
+    ("weak-scaling-2026-stokes-BASE5-3way/default", "C3", "BASE=5, tol 1e-8"),
     ("weak-scaling-2026-stokes-BASE10",             "C2", "BASE=10 packed"),
     ("weak-scaling-2026-stokes-BASE10-spread",      "C4", "BASE=10 spread"),
 ]
@@ -141,18 +150,23 @@ def main():
     os.makedirs(outdir, exist_ok=True)
     out = os.path.join(outdir, "stokes.png")
 
+    # Campaigns are held in `cache`, keyed by path, not in a list of tuples.
+    reps = sorted({d[n]["n_replicates"] for d in cache.values() for n in d})
+    reps_txt = f"{reps[0]}" if len(reps) == 1 else f"{reps[0]}-{reps[-1]}"
+
     fs.caption(fig,
                "Fixed-tolerance protocol: every point converges in 1 outer Krylov iteration, "
-               "so cost is what varies. The two settings differ in the WHOLE tolerance chain "
-               "— outer 1e-8/inner 1e-9 against outer 1e-5/inner 1e-6 — because #477 prevents "
-               "setting the inner rtol independently in v3.1.0. BASE=5 spherical shell, "
-               "3 replicates; BASE=10 at inner rtol 1e-6, 2-3 replicates. Efficiency is "
+               "so cost is what varies. ONE knob was turned — stokes.tolerance, 1e-8 vs 1e-5. "
+               "snes_rtol, ksp_atol (x1e-6) and the fieldsplit block rtols (x0.1 pressure, "
+               "x0.033 velocity) all follow from it in fixed proportion; the outer KSP has no "
+               "fixed rtol, since the setter enables Eisenstat-Walker. BASE=5 spherical "
+               f"shell, {reps_txt} replicates; BASE=10 at tolerance 1e-5. Efficiency is "
                "normalised to serial. A Gadi node is 48 cores, so the sweep runs 27 on one "
                "node, then 48+16 at 64 ranks (avg 32/node), rising to 47.6/node at 1000 — "
-               "the knee at 64 is where a node first fills. Rows 1 and 2 "
-               "share a y range so the 1.8x cost difference is visible; note the efficiency "
-               "panels barely differ. solver_setup omitted (0.0 s throughout).")
-    fs.finish(fig, "Underworld3 Stokes — weak scaling by inner tolerance, "
+               "the knee at 64 is where a node first fills. Rows 1 and 2 share a y range so "
+               "the 1.8x cost difference is visible; note the efficiency panels barely "
+               "differ. solver_setup omitted (0.0 s throughout).")
+    fs.finish(fig, "Underworld3 Stokes — weak scaling by solve tolerance, "
                    "work per rank and rank placement", out)
 
     print(f"{'config':<24}{'stage':<15}{'ranks':>7}{'vs serial':>11}{'vs packed':>11}")

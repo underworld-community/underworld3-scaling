@@ -59,7 +59,11 @@ RUN_COLS = ["campaign", "site", "model", "nprocs", "res", "replicate", "ranks_pe
 STAGE_COLS = ["campaign", "nprocs", "replicate", "stage",
               "time", "time_rank0", "messages", "reductions", "flop"]
 EVENT_COLS = ["campaign", "nprocs", "replicate", "stage", "event",
-              "count_max", "count_min", "time_rank0"]
+              "count_max", "count_min", "time_rank0",
+              # Without these the archive cannot answer whether an event is one rank
+              # working or every rank waiting, and the analysis falls back to re-reading
+              # hundreds of MB of raw timing.csv. n_working = ranks above half the max.
+              "time_max", "time_min", "time_mean", "n_working"]
 
 
 def main():
@@ -78,7 +82,10 @@ def main():
     # A round characterises a RELEASE, so cross-release comparison is the point — and it is
     # only valid while the benchmark measures the same work. Bump this whenever a model
     # script changes what it measures, so a later comparison can refuse to mix them.
-    ap.add_argument("--benchmark-version", type=int, default=1)
+    # v2 = every stage followed by a timed barrier, and the mesh read from .msh.h5. Both
+    # change what the stage numbers mean, so v1 and v2 stages are not comparable. Pass
+    # --benchmark-version 1 explicitly when re-exporting a pre-barrier round.
+    ap.add_argument("--benchmark-version", type=int, default=2)
     ap.add_argument("--benchmark-note", default="")
     args = ap.parse_args()
 
@@ -133,6 +140,10 @@ def main():
                         "count_max": v.get("max", 0),
                         "count_min": v.get("min", 0),
                         "time_rank0": v.get("time", 0.0),
+                        "time_max": v.get("time_max", 0.0),
+                        "time_min": v.get("time_min", 0.0),
+                        "time_mean": v.get("time_mean", 0.0),
+                        "n_working": v.get("n_working", 0),
                     })
 
     _write_csv(os.path.join(outdir, "runs.csv"), RUN_COLS, runs)
