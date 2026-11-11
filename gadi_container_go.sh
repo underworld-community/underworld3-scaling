@@ -10,7 +10,7 @@
 module load singularity
 module load openmpi/4.1.7
 
-export CONTAINER=/g/data/m18/software/containers/underworld3-gadi_v3.1.0.sif
+export CONTAINER=${UW_CONTAINER:?set UW_CONTAINER in params.sh}
 export EXTRA_PKGS=/scratch/el06/jg0883/uw3-extra-pkgs
 
 # Host-MPI injection for InfiniBand RDMA on Gadi (mirrors UW2 Gadi recipe).
@@ -72,6 +72,7 @@ mpiexec ${UW_MPI_MAP:-} -n ${NTASKS} singularity exec \
     bash -c \
     "LD_LIBRARY_PATH=${HOST_MPI_LIB}:${HOST_OMPI_RT}:${HOST_UCX}:${HOST_UCC}:${HOST_HCOLL}:/opt/pbs/default/lib:/half-root/usr/lib64:/half-root/lib64:\${LD_LIBRARY_PATH} \
      PYTHONPATH=${EXTRA_PKGS}:\${PYTHONPATH} \
+     UW_SIF=${CONTAINER} \
      OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 \
      python3 ${UW_MODEL}.py \
      -uw_scaling ${TYPE} \

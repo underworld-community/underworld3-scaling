@@ -2,46 +2,51 @@
 #PBS -N mesh_generate
 #PBS -q normal
 #PBS -l ncpus=1
-#PBS -l mem=64GB
-#PBS -l walltime=06:00:00
+#PBS -l mem=32GB
+#PBS -l walltime=02:00:00
 #PBS -l storage=scratch/el06+gdata/m18
 #PBS -P el06
 #PBS -j oe
 
 # Gmsh runs single-process — no MPI needed, so we use singularity exec directly.
-# 64 GB covers the largest box mesh in the campaign (res=240, ~14M tets).
-# Walltime 6 h is generous; expect ~2-3 h for the full set at BASE=24.
+# Gadi charges max(ncpus, mem/4GB): 32 GB is enough up to box res~168; the res=240
+# box (~14M tets) needed 64 GB and ~2 h on its own, and the BASE-10 stokes res=100
+# shell (job 10) needed the hugemem queue at 1000 GB / 8 h.
 
 cd ~/uw3-scaling-scripts
 source params.sh
 
-export CONTAINER=/g/data/m18/software/containers/underworld3-gadi_v3.1.0.sif
+export CONTAINER=${UW_CONTAINER:?set UW_CONTAINER in params.sh}
 export EXTRA_PKGS=/scratch/el06/jg0883/uw3-extra-pkgs
 
 module load singularity
 
-# Campaign-specific overrides (independent of whatever params.sh is set to)
-SCALING_BASE=24
-JOBS="1 2 3 4 5"
-MODELS="poisson-scaling"   # one box model is enough; box mesh is shared by all rectangular models
+# One line per mesh family this round, "model:base:jobs" — independent of params.sh,
+# whose BASE only describes the box models.
+MESH_SETS=(
+    "poisson-scaling:24:1 2 4"
+    "stokes-scaling:5:1 2 4"
+)
 
 echo "=== Mesh pre-generation ==="
-echo "SCALING_BASE = ${SCALING_BASE}"
-echo "JOBS         = ${JOBS}"
-echo "MESH_CACHE   = ${MESH_CACHE}"
-echo "Models       = ${MODELS}"
-echo ""
+echo "MESH_CACHE = ${MESH_CACHE}"
+echo "CONTAINER  = ${CONTAINER}"
 
-singularity exec \
-    --bind /half-root \
-    --bind /opt/pbs/default/lib \
-    ${CONTAINER} \
-    bash -c \
-    "PYTHONPATH=${EXTRA_PKGS}:\${PYTHONPATH} \
-     python3 generate_meshes.py \
-     --models '${MODELS}' \
-     --base   ${SCALING_BASE} \
-     --jobs   '${JOBS}' \
-     --cache  ${MESH_CACHE}"
+for spec in "${MESH_SETS[@]}"; do
+    IFS=: read -r MODEL BASE JOBS <<< "${spec}"
+    echo ""
+    echo "--- ${MODEL}  BASE=${BASE}  JOBS=${JOBS}"
+    singularity exec \
+        --bind /half-root \
+        --bind /opt/pbs/default/lib \
+        ${CONTAINER} \
+        bash -c \
+        "PYTHONPATH=${EXTRA_PKGS}:\${PYTHONPATH} \
+         python3 generate_meshes.py \
+         --models '${MODEL}' \
+         --base   ${BASE} \
+         --jobs   '${JOBS}' \
+         --cache  ${MESH_CACHE}"
+done
 
 echo "=== Done ==="

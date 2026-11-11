@@ -57,6 +57,36 @@ it      = params.uw_idx
 max_it  = params.uw_maxits
 init_state = params.uw_init
 
+
+# Read back what PETSc will actually use: UW3 rewrites options during solve(), and v3.2.0's
+# preconditioner="auto" can silently fall back from FMG to GAMG (#625).
+_OPTIONS_TO_REPORT = ("ksp_type", "ksp_rtol", "ksp_atol", "ksp_max_it",
+                      "snes_rtol", "snes_atol", "snes_max_it", "pc_type")
+
+
+def report_effective_options(solver):
+    opts = solver.petsc_options
+    return {k: (opts.getString(k) if opts.hasName(k) else None) for k in _OPTIONS_TO_REPORT}
+
+
+def rank_placement():
+    """Collective — every rank must call it. ranks_per_node sets memory bandwidth per rank."""
+    from mpi4py import MPI
+    from collections import Counter
+    per_node = Counter(MPI.COMM_WORLD.allgather(MPI.Get_processor_name()))
+    return {"n_nodes": len(per_node),
+            "ranks_per_node_max": max(per_node.values()),
+            "ranks_per_node_min": min(per_node.values())}
+
+
+def environment_info(solver):
+    """Release identity for the round manifest: image, UW3 version, 32/64-bit PETSc ints."""
+    int_type = getattr(PETSc, "IntType", None)
+    return {"uw_version": getattr(uw, "__version__", None),
+            "sif": os.environ.get("UW_SIF"),
+            "petsc_int_type": getattr(int_type, "__name__", str(int_type)),
+            "pc_fallbacks": getattr(solver, "pc_fallbacks", None)}   # v3.2.0+, else None
+
 # --------------------------------------------------------------------------- #
 # Output directory                                                             #
 # --------------------------------------------------------------------------- #
@@ -83,15 +113,14 @@ if uw.mpi.rank == 0:
     os.makedirs(mesh_cache, exist_ok=True)
 uw.mpi.barrier()
 
-cache_file = f"{mesh_cache}/UnstructuredSimplexBox_res{res}.msh"
+# Prefer the cached .msh.h5: handed a .msh, Mesh() first runs a serial rank-0 gmsh->h5
+# conversion (DMPlexCrFromFile) — 2329 s of the 5621 s mesh_setup at 2197 ranks in round 1.
+# The .h5 is read in place; the copy exists only for the .msh path, whose conversion writes
+# beside its input so concurrent jobs would race (#565). Same pattern as advdiff-scaling.py.
+cache_msh = f"{mesh_cache}/UnstructuredSimplexBox_res{res}.msh"
+cache_h5  = f"{cache_msh}.h5"
 
-if os.path.exists(cache_file):
-    import shutil
-    local_msh = f"{outdir}/mesh.msh"
-    if uw.mpi.rank == 0:
-        shutil.copy2(cache_file, local_msh)
-    uw.mpi.barrier()
-
+if os.path.exists(cache_h5) or os.path.exists(cache_msh):
     class _boundaries_3D(Enum):
         Bottom = 11; Top = 12; Right = 13; Left = 14; Front = 15; Back = 16
 
@@ -101,8 +130,18 @@ if os.path.exists(cache_file):
         Front  = sympy.Matrix([0, 1, 0]); Back  = sympy.Matrix([0, 1, 0])
 
     from underworld3.coordinates import CoordinateSystemType
+
+    if os.path.exists(cache_h5):
+        mesh_file = cache_h5
+    else:
+        import shutil
+        mesh_file = f"{outdir}/mesh.msh"
+        if uw.mpi.rank == 0:
+            shutil.copy2(cache_msh, mesh_file)
+        uw.mpi.barrier()
+
     meshbox = uw.discretisation.Mesh(
-        local_msh,
+        mesh_file,
         degree=1,
         qdegree=qdeg,
         boundaries=_boundaries_3D,
@@ -118,7 +157,7 @@ else:
         maxCoords=(1., 1., 1.),
         cellSize=1.0 / res,
         qdegree=qdeg,
-        filename=cache_file,
+        filename=cache_msh,
     )
 
 if uw.mpi.rank == 0:
@@ -128,6 +167,15 @@ meshbox.dm.view()
 u_sol = uw.discretisation.MeshVariable("U", meshbox, 1, degree=udeg)
 u_ana = uw.discretisation.MeshVariable("u", meshbox, 1, degree=udeg)
 
+stage.pop()
+
+# Every stage is followed by a timed barrier in its own <name>_sync stage. stage.pop() is
+# rank-local, so without it early ranks carry their lead into the next stage, whose first
+# collective absorbs it — the artefact behind the retracted eval_nodal result. <name> is the
+# slowest rank's work, <name>_sync the arrival spread; they sum to the true span. Costs
+# 0.01 s in a 3791 s advdiff run. Rationale in full in advdiff-scaling.py.
+stage = PETSc.Log.Stage("mesh_setup_sync"); stage.push()
+uw.mpi.barrier()
 stage.pop()
 
 # --------------------------------------------------------------------------- #
@@ -163,6 +211,10 @@ if max_it > 0:
 
 stage.pop()
 
+stage = PETSc.Log.Stage("solver_setup_sync"); stage.push()
+uw.mpi.barrier()
+stage.pop()
+
 # Initial state for both solve stages.
 #
 # With uw_init="zero" (the original behaviour) the nonlinearity never acts. The fixed-work
@@ -196,6 +248,13 @@ poisson.solve(zero_init_guess=False)
 
 stage.pop()
 
+stage = PETSc.Log.Stage("first_solve_sync"); stage.push()
+uw.mpi.barrier()
+stage.pop()
+
+effective_options = report_effective_options(poisson)
+uw.pprint(f"effective options after first_solve: {effective_options}")
+
 # --------------------------------------------------------------------------- #
 # STAGE: steady_solves  (JIT-warm re-solve — isolates pure solver cost)       #
 # Restore the same initial state so the iteration count matches first_solve.  #
@@ -205,6 +264,10 @@ stage = PETSc.Log.Stage("steady_solves"); stage.push()
 u_sol.data[:, 0] = _u_initial
 poisson.solve(zero_init_guess=False)
 
+stage.pop()
+
+stage = PETSc.Log.Stage("steady_solves_sync"); stage.push()
+uw.mpi.barrier()
 stage.pop()
 
 # --------------------------------------------------------------------------- #
@@ -222,12 +285,21 @@ rel_norm  = u_diff_l2 / u_ana_l2
 
 uw.pprint(f"Relative L2 error: {rel_norm:.6e}  ({100*rel_norm:.4f} %)")
 
+placement = rank_placement()   # collective: outside the rank-0 block
+
 if uw.mpi.rank == 0:
     with open(f"{outdir}/errors.json", "w") as fp:
         json.dump({"model": "poisson-scaling", "rel_norm": rel_norm, "res": res,
                    "nprocs": uw.mpi.size, "scaling": scaling,
-                   "init_state": init_state}, fp, indent=4)
+                   "init_state": init_state,
+                   "effective_options": effective_options,
+                   "placement": placement,
+                   **environment_info(poisson)}, fp, indent=4, default=str)
 
+stage.pop()
+
+stage = PETSc.Log.Stage("error_analysis_sync"); stage.push()
+uw.mpi.barrier()
 stage.pop()
 
 # --------------------------------------------------------------------------- #

@@ -81,6 +81,15 @@ def report_effective_options(solver, label):
     return effective
 
 
+def environment_info(solver):
+    """Release identity for the round manifest: image, UW3 version, 32/64-bit PETSc ints."""
+    int_type = getattr(PETSc, "IntType", None)
+    return {"uw_version": getattr(uw, "__version__", None),
+            "sif": os.environ.get("UW_SIF"),
+            "petsc_int_type": getattr(int_type, "__name__", str(int_type)),
+            "pc_fallbacks": getattr(solver, "pc_fallbacks", None)}   # v3.2.0+, else None
+
+
 def rank_placement():
     """How ranks are distributed over nodes.
 
@@ -450,7 +459,8 @@ if uw.mpi.rank == 0:
             "effective_options": effective_options,
             "placement": placement,
             "solver_stats": solver_stats,
-        }, fp, indent=4)
+            **environment_info(adv_diff),
+        }, fp, indent=4, default=str)
 
 # --------------------------------------------------------------------------- #
 # Timing output                                                                #

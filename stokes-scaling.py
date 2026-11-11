@@ -114,6 +114,15 @@ def rank_placement():
     }
 
 
+def environment_info(solver):
+    """Release identity for the round manifest: image, UW3 version, 32/64-bit PETSc ints."""
+    int_type = getattr(PETSc, "IntType", None)
+    return {"uw_version": getattr(uw, "__version__", None),
+            "sif": os.environ.get("UW_SIF"),
+            "petsc_int_type": getattr(int_type, "__name__", str(int_type)),
+            "pc_fallbacks": getattr(solver, "pc_fallbacks", None)}   # v3.2.0+, else None
+
+
 def _reason_name(reason_cls, code):
     """PETSc converged-reason integer → its symbolic name, e.g. 2 → CONVERGED_RTOL."""
     for name in dir(reason_cls):
@@ -204,22 +213,31 @@ if uw.mpi.rank == 0:
     os.makedirs(mesh_cache, exist_ok=True)
 uw.mpi.barrier()
 
-cache_file = f"{mesh_cache}/SphericalShell_ri{r_i}_ro{r_o}_res{res}.msh"
+# Prefer the cached .msh.h5: handed a .msh, Mesh() first runs a serial rank-0 gmsh->h5
+# conversion (DMPlexCrFromFile) — the dominant serial event in every round-1 campaign. Read
+# in place; the copy exists only for the .msh path, whose conversion writes beside its
+# input so concurrent jobs would race (#565). Same pattern as advdiff-scaling.py.
+cache_msh = f"{mesh_cache}/SphericalShell_ri{r_i}_ro{r_o}_res{res}.msh"
+cache_h5  = f"{cache_msh}.h5"
 
-if os.path.exists(cache_file):
-    import shutil
-    local_msh = f"{output_dir}/mesh.msh"
-    if uw.mpi.rank == 0:
-        shutil.copy2(cache_file, local_msh)
-    uw.mpi.barrier()
-
+if os.path.exists(cache_h5) or os.path.exists(cache_msh):
     class _boundaries_spherical(Enum):
         Lower = 11
         Upper = 12
 
     from underworld3.coordinates import CoordinateSystemType
+
+    if os.path.exists(cache_h5):
+        mesh_file = cache_h5
+    else:
+        import shutil
+        mesh_file = f"{output_dir}/mesh.msh"
+        if uw.mpi.rank == 0:
+            shutil.copy2(cache_msh, mesh_file)
+        uw.mpi.barrier()
+
     mesh = uw.discretisation.Mesh(
-        local_msh,
+        mesh_file,
         qdegree=qdeg,
         boundaries=_boundaries_spherical,
         boundary_normals=None,
@@ -233,7 +251,7 @@ else:
         radiusInner=r_i, radiusOuter=r_o,
         cellSize=cellsize,
         qdegree=qdeg,
-        filename=cache_file,
+        filename=cache_msh,
     )
 
 v_uw = uw.discretisation.MeshVariable("V_u", mesh, mesh.dim, degree=vdegree)
@@ -243,6 +261,13 @@ if uw.mpi.rank == 0:
     uw.pprint("--- mesh partition ---")
 mesh.dm.view()
 
+stage.pop()
+
+# Every stage is followed by a timed barrier in its own <name>_sync stage: stage.pop() is
+# rank-local, so early ranks would otherwise carry their lead into the next stage's first
+# collective. <name> = slowest rank's work, <name>_sync = arrival spread. See advdiff-scaling.py.
+stage = PETSc.Log.Stage("mesh_setup_sync"); stage.push()
+uw.mpi.barrier()
 stage.pop()
 
 # --------------------------------------------------------------------------- #
@@ -355,6 +380,10 @@ if max_it > 0:
 
 stage.pop()
 
+stage = PETSc.Log.Stage("solver_setup_sync"); stage.push()
+uw.mpi.barrier()
+stage.pop()
+
 # Snapshot the options BEFORE solving. Comparing this against the after-solve readback
 # separates "our value never landed" from "solve() overwrote it" — UW3's solve() pushes
 # its own snes_max_it and (in versions predating issue #477) re-derives the inner
@@ -369,6 +398,12 @@ stage = PETSc.Log.Stage("first_solve"); stage.push()
 stokes.solve(verbose=True, debug=False)
 
 stage.pop()
+
+# Barrier before the stats capture, so nothing between pop and barrier can absorb the skew.
+stage = PETSc.Log.Stage("first_solve_sync"); stage.push()
+uw.mpi.barrier()
+stage.pop()
+
 solver_stats = {"first_solve": capture_solver_stats(stokes)}
 effective_options = report_effective_options(stokes, "after first_solve")
 
@@ -391,6 +426,11 @@ p_uw.data[:] = 0.0
 stokes.solve(verbose=True, debug=False)
 
 stage.pop()
+
+stage = PETSc.Log.Stage("steady_solves_sync"); stage.push()
+uw.mpi.barrier()
+stage.pop()
+
 solver_stats["steady_solves"] = capture_solver_stats(stokes)
 
 # --------------------------------------------------------------------------- #
@@ -412,7 +452,8 @@ if uw.mpi.rank == 0:
             "effective_options": effective_options,
             "placement": placement,
             "solver_stats": solver_stats,
-        }, fp, indent=4)
+            **environment_info(stokes),
+        }, fp, indent=4, default=str)
 
 # --------------------------------------------------------------------------- #
 # Timing output                                                                #

@@ -1,5 +1,7 @@
 #!/bin/bash
-source params.sh
+# Optional argument: a params file layered on params.sh (e.g. params-stokes.sh), so models
+# with different BASE/tolerance can be launched without editing params.sh in between.
+source "${1:-params.sh}"
 
 if (($SCALING_TYPE==1)); then
    export TYPE="Weak"
@@ -80,7 +82,7 @@ do
             # params.sh but MISSING here is silently unset inside the job, so the
             # launcher's ${VAR:-default} falls back and the run quietly uses the default
             # — it does not fail. Add every new params.sh variable here.
-            export EXPORTVARS="TYPE,UW_RESOLUTION,NTASKS,UW_DIM,UW_SOL_TOLERANCE,UW_MAX_ITS,UW_MODEL,SCALING_TYPE,UW_NAME,JOB_IDX,RUN_IDX,NAME,OUTPUT_BASE,MESH_CACHE,UW_VEP_INTEGRATOR,UW_MEMPROBE,UW_NS_RE,UW_NSTEPS,UW_INNER_RTOL,UW_MPI_MAP,UW_INIT"
+            export EXPORTVARS="TYPE,UW_RESOLUTION,NTASKS,UW_DIM,UW_SOL_TOLERANCE,UW_MAX_ITS,UW_MODEL,SCALING_TYPE,UW_NAME,JOB_IDX,RUN_IDX,NAME,OUTPUT_BASE,MESH_CACHE,UW_VEP_INTEGRATOR,UW_MEMPROBE,UW_NS_RE,UW_NSTEPS,UW_INNER_RTOL,UW_MPI_MAP,UW_INIT,UW_CONTAINER"
 
             if [ $BATCH_SYS == "PBS" ] ; then
                 PBSTASKS=`python3 <<<"print((int(${NTASKS}/48) + (${NTASKS} % 48 > 0))*48*${PBSTASK_MULT})"`
