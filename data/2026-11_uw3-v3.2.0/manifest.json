@@ -3,7 +3,7 @@
   "generated": "2026-11-12",
   "uw3_version": "v3.2.0",
   "benchmark_version": 2,
-  "benchmark_note": "release check at 1-343 ranks, 2 replicates per point (job 1 up to 4, the first ones cold-JIT); timed barrier after every stage, mesh read from .msh.h5; stokes steady_solves auto warm-starts in v3.2.0 (zero_init_guess=None) so it carries one extra cheap SNESSolve",
+  "benchmark_note": "release check at 1-1000 ranks, 2 replicates per point (job 1 up to 4, the first ones cold-JIT); timed barrier after every stage, mesh read from .msh.h5; stokes steady_solves auto warm-starts in v3.2.0 (zero_init_guess=None) so it carries one extra cheap SNESSolve; checkpoint-scaling adds I/O and evaluate stages, swarm-scaling dense swarm advection, both without a solve",
   "sites": {
     "gadi": {
       "petsc_version": "3.25.0",
@@ -14,11 +14,13 @@
   },
   "campaigns": [
     "weak-scaling-2026-11-advdiff",
+    "weak-scaling-2026-11-checkpoint",
     "weak-scaling-2026-11-poisson",
-    "weak-scaling-2026-11-stokes"
+    "weak-scaling-2026-11-stokes",
+    "weak-scaling-2026-11-swarm"
   ],
   "missing_campaigns": [],
-  "n_runs": 40,
+  "n_runs": 75,
   "n_cold_jit_runs": 4,
   "raw_output_note": "Raw PETSc logs (5.8 GB, one 423 MB file at 2197 ranks) lived under /scratch/el06/jg0883 on Gadi and are subject to scratch purging. This reduction is the archival copy: it holds every number the figures use."
 }

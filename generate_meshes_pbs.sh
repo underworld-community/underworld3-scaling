@@ -2,8 +2,8 @@
 #PBS -N mesh_generate
 #PBS -q normal
 #PBS -l ncpus=1
-#PBS -l mem=64GB
-#PBS -l walltime=04:00:00
+#PBS -l mem=96GB
+#PBS -l walltime=12:00:00
 #PBS -l storage=scratch/el06+gdata/m18
 #PBS -P el06
 #PBS -j oe
@@ -11,7 +11,10 @@
 # Gmsh runs single-process — no MPI needed, so we use singularity exec directly.
 # Gadi charges max(ncpus, mem/4GB): 32 GB is enough up to box res~168; the res=240
 # box (~14M tets) needed 64 GB and ~2 h on its own, and the BASE-10 stokes res=100
-# shell (job 10) needed the hugemem queue at 1000 GB / 8 h.
+# shell (job 10) needed the hugemem queue at 1000 GB / 8 h. Converting an existing .msh
+# to .h5 is cheaper than generating but not cheap: the res-240 box took 23 min at
+# 50 GB, while the BASE-5 res-50 shell was still running after 3.5 h (2026-11-12) —
+# hence 12 h here. The shell conversion is far slower than its size suggests.
 
 cd ~/uw3-scaling-scripts
 source params.sh

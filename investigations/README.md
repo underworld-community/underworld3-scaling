@@ -282,7 +282,9 @@ data/<round>/{manifest.json, runs.csv, stages.csv, events.csv, info.json}
 from the CSVs, so archived figures stay reproducible without Gadi. `runs.csv` also carries
 `jit_s` and `cold_jit`: a replicate whose JIT compile time exceeds the fastest replicate at
 the same rank count by more than 1 s and 3× ran on a cold cache and is left out of every
-mean (relative, not absolute, because v3.1.0 Stokes recompiled on every run).
+mean (relative, not absolute, because v3.1.0 Stokes recompiled on every run). `excluded`
+holds the reason for the rare replicate dropped by hand (`figdata.EXCLUDE`), such as a
+slow node; an empty field means the replicate counts.
 
 **Lossy in one way:** per-event max/min across ranks and rank 0's time are kept, but not
 per-rank rows — a histogram across 2197 ranks could not be rebuilt. Keep raw until a round
@@ -302,7 +304,7 @@ stage ended on a collective and the artefact could only occur at the bare `evalu
 | round | release | benchmark | site | |
 |---|---|---|---|---|
 | *(open)* `2026-08_uw3-v3.1.0` | v3.1.0 | 1 | Gadi | this page |
-| `2026-11_uw3-v3.2.0` | v3.2.0 | 2 | Gadi | release check at 1–343 ranks; [front page](../README.md), [attribution](release_v3.2.0.md) |
+| `2026-11_uw3-v3.2.0` | v3.2.0 | 2 | Gadi | release check at 1–343 ranks; [front page](../README.md), [comparison](v3.2.0-vs-v3.1.0.md) |
 
 ## Open questions
 
@@ -315,6 +317,12 @@ stage ended on a collective and the artefact could only occur at the bare `evalu
 - **SLCN within-stage imbalance** — `KDTree.query` 116 / 83 / 99 s max/min/mean at 343 ranks
   (33% spread), hidden by the stage's trailing collective. Now visible via exported
   `time_max/min/mean`; unquantified across the sweep.
+- **`Swarm.estimate_dt` on every advection step** — `advection()` evaluates the velocity at
+  every particle to bound the timestep even when `step_limit=False`, ~7% of the swarm hot
+  path at 343 ranks. Intended, or an unconditional call that should be guarded?
+- **Swarm particles lost at subdomain seams** — 0.01–0.025% of the swarm per 11 steps in
+  parallel, none in serial, with zero normal flow at every wall. Usage check first
+  (`restore_points_to_domain_func`, `migrate` retries), then upstream.
 - **`read_checkpoint()` unmeasured** — the native same-mesh reload path. This campaign timed
   the coordinate-remap reader instead, so UW3's actual restart cost is unknown.
 - **Setonix** — would separate "UW3 does this" from "Gadi does this". Blocked on

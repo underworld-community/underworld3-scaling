@@ -52,6 +52,58 @@
       "tol": 1e-50,
       "uw_version": "3.2.0"
     },
+    "1000": {
+      "dt": 0.0020833333333333333,
+      "effective_options": {
+        "ksp_atol": "1e-50",
+        "ksp_max_it": "10",
+        "ksp_rtol": "1e-50",
+        "pc_type": "gamg",
+        "snes_atol": "1e-50",
+        "snes_ksp_ew": null,
+        "snes_max_it": "10",
+        "snes_rtol": "1e-50"
+      },
+      "max_drift_from_initial": 1.2246399186922782e-16,
+      "model": "advdiff-scaling",
+      "monotone_mode": null,
+      "n_steady_steps": 10,
+      "nprocs": 1000,
+      "pc_fallbacks": {},
+      "petsc_int_type": "int32",
+      "placement": {
+        "n_nodes": 21,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 40
+      },
+      "res": 240,
+      "scaling": "Weak",
+      "sif": "/g/data/m18/software/containers/underworld3/underworld3-v3.2.0-20261104-254152221812.sif",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 10,
+          "ksp_its_total": 10,
+          "ksp_reason": "DIVERGED_MAX_IT",
+          "ksp_rnorm_final": 2.7366289259749723e-05,
+          "snes_fnorm_final": 0.0017086619693041398,
+          "snes_its": 0,
+          "snes_reason": "DIVERGED_LINEAR_SOLVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 10,
+          "ksp_its_total": 0,
+          "ksp_reason": "DIVERGED_MAX_IT",
+          "ksp_rnorm_final": 2.7223917633659644e-05,
+          "n_timesteps": 10,
+          "snes_fnorm_final": 0.0017086619696135793,
+          "snes_its": 0,
+          "snes_reason": "DIVERGED_LINEAR_SOLVE"
+        }
+      },
+      "theta": 1.0,
+      "tol": 1e-50,
+      "uw_version": "3.2.0"
+    },
     "125": {
       "dt": 0.004166666666666667,
       "effective_options": {
@@ -313,6 +365,162 @@
       "uw_version": "3.2.0"
     }
   },
+  "weak-scaling-2026-11-checkpoint": {
+    "1": {
+      "checkpoint_bytes": 18421944,
+      "checkpoint_bytes_native": 91031268,
+      "eval_offnode_max_err": 1.1997582794465167e-05,
+      "eval_offnode_nonfinite": 0,
+      "model": "checkpoint-scaling",
+      "n_eval_points": 12300,
+      "nprocs": 1,
+      "placement": {
+        "n_nodes": 1,
+        "ranks_per_node_max": 1,
+        "ranks_per_node_min": 1
+      },
+      "res": 24,
+      "roundtrip_T_err": 0.0,
+      "roundtrip_T_err_native": 0.0,
+      "roundtrip_p_err": 0.0,
+      "roundtrip_p_err_native": 0.0,
+      "roundtrip_v_err": 0.0,
+      "roundtrip_v_err_native": 0.0,
+      "scaling": "Weak"
+    },
+    "1000": {
+      "checkpoint_bytes": 16331409366,
+      "checkpoint_bytes_native": 83277854300,
+      "eval_offnode_max_err": 0.005378957446539379,
+      "eval_offnode_nonfinite": 0,
+      "model": "checkpoint-scaling",
+      "n_eval_points": 11323538,
+      "nprocs": 1000,
+      "placement": {
+        "n_nodes": 21,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 40
+      },
+      "res": 240,
+      "roundtrip_T_err": 0.0,
+      "roundtrip_T_err_native": 0.9964322366790102,
+      "roundtrip_p_err": 0.0,
+      "roundtrip_p_err_native": 0.9999916386434472,
+      "roundtrip_v_err": 0.0,
+      "roundtrip_v_err_native": 1.9998971843392295,
+      "scaling": "Weak"
+    },
+    "125": {
+      "checkpoint_bytes": 2067723864,
+      "checkpoint_bytes_native": 10453273300,
+      "eval_offnode_max_err": 0.010650149693343436,
+      "eval_offnode_nonfinite": 0,
+      "model": "checkpoint-scaling",
+      "n_eval_points": 1431955,
+      "nprocs": 125,
+      "placement": {
+        "n_nodes": 3,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 29
+      },
+      "res": 120,
+      "roundtrip_T_err": 0.0,
+      "roundtrip_T_err_native": 1.0,
+      "roundtrip_p_err": 0.0,
+      "roundtrip_p_err_native": 0.9999368868977868,
+      "roundtrip_v_err": 0.0,
+      "roundtrip_v_err_native": 1.999606536688873,
+      "scaling": "Weak"
+    },
+    "27": {
+      "checkpoint_bytes": 453773512,
+      "checkpoint_bytes_native": 2287608492,
+      "eval_offnode_max_err": 0.016028211556282534,
+      "eval_offnode_nonfinite": 0,
+      "model": "checkpoint-scaling",
+      "n_eval_points": 313857,
+      "nprocs": 27,
+      "placement": {
+        "n_nodes": 1,
+        "ranks_per_node_max": 27,
+        "ranks_per_node_min": 27
+      },
+      "res": 72,
+      "roundtrip_T_err": 0.0,
+      "roundtrip_T_err_native": 1.0,
+      "roundtrip_p_err": 0.0,
+      "roundtrip_p_err_native": 0.9999492597788322,
+      "roundtrip_v_err": 0.0,
+      "roundtrip_v_err_native": 1.9997586063308987,
+      "scaling": "Weak"
+    },
+    "343": {
+      "checkpoint_bytes": 5633479334,
+      "checkpoint_bytes_native": 28825998832,
+      "eval_offnode_max_err": 0.007712853960396726,
+      "eval_offnode_nonfinite": 0,
+      "model": "checkpoint-scaling",
+      "n_eval_points": 3900997,
+      "nprocs": 343,
+      "placement": {
+        "n_nodes": 8,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 7
+      },
+      "res": 168,
+      "roundtrip_T_err": 0.0,
+      "roundtrip_T_err_native": 1.0,
+      "roundtrip_p_err": 0.0,
+      "roundtrip_p_err_native": 0.999982762955746,
+      "roundtrip_v_err": 0.0,
+      "roundtrip_v_err_native": 1.9994316818745708,
+      "scaling": "Weak"
+    },
+    "64": {
+      "checkpoint_bytes": 1065700468,
+      "checkpoint_bytes_native": 5380813352,
+      "eval_offnode_max_err": 0.012615744017458685,
+      "eval_offnode_nonfinite": 0,
+      "model": "checkpoint-scaling",
+      "n_eval_points": 735132,
+      "nprocs": 64,
+      "placement": {
+        "n_nodes": 2,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 16
+      },
+      "res": 96,
+      "roundtrip_T_err": 0.0,
+      "roundtrip_T_err_native": 1.0,
+      "roundtrip_p_err": 0.0,
+      "roundtrip_p_err_native": 0.9998901656801334,
+      "roundtrip_v_err": 0.0,
+      "roundtrip_v_err_native": 1.9996653526136425,
+      "scaling": "Weak"
+    },
+    "8": {
+      "checkpoint_bytes": 137735658,
+      "checkpoint_bytes_native": 691198260,
+      "eval_offnode_max_err": 0.02300329780451088,
+      "eval_offnode_nonfinite": 0,
+      "model": "checkpoint-scaling",
+      "n_eval_points": 94312,
+      "nprocs": 8,
+      "placement": {
+        "n_nodes": 1,
+        "ranks_per_node_max": 8,
+        "ranks_per_node_min": 8
+      },
+      "res": 48,
+      "roundtrip_T_err": 0.0,
+      "roundtrip_T_err_native": 1.0,
+      "roundtrip_p_err": 0.0,
+      "roundtrip_p_err_native": 0.9999466181166378,
+      "roundtrip_v_err": 0.0,
+      "roundtrip_v_err_native": 1.9991111541976407,
+      "scaling": "Weak"
+    }
+  },
   "weak-scaling-2026-11-poisson": {
     "1": {
       "effective_options": {
@@ -337,6 +545,33 @@
       },
       "rel_norm": 1.0,
       "res": 24,
+      "scaling": "Weak",
+      "sif": "/g/data/m18/software/containers/underworld3/underworld3-v3.2.0-20261104-254152221812.sif",
+      "uw_version": "3.2.0"
+    },
+    "1000": {
+      "effective_options": {
+        "ksp_atol": "1e-50",
+        "ksp_max_it": "10",
+        "ksp_rtol": "1e-50",
+        "ksp_type": "gmres",
+        "pc_type": "gamg",
+        "snes_atol": "1e-50",
+        "snes_max_it": "10",
+        "snes_rtol": "1e-50"
+      },
+      "init_state": "zero",
+      "model": "poisson-scaling",
+      "nprocs": 1000,
+      "pc_fallbacks": {},
+      "petsc_int_type": "int32",
+      "placement": {
+        "n_nodes": 21,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 40
+      },
+      "rel_norm": 1.0,
+      "res": 240,
       "scaling": "Weak",
       "sif": "/g/data/m18/software/containers/underworld3/underworld3-v3.2.0-20261104-254152221812.sif",
       "uw_version": "3.2.0"
@@ -527,6 +762,63 @@
           "ksp_reason": "CONVERGED_RTOL",
           "ksp_rnorm_final": 2.5611704021146644e-11,
           "snes_fnorm_final": 2.5611704281993588e-11,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_ABS"
+        }
+      },
+      "tolerance_effective": 1e-08,
+      "tolerance_requested": 1e-08,
+      "uw_version": "3.2.0"
+    },
+    "1000": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-09",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.3e-10",
+        "ksp_atol": "1e-14",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "3",
+        "snes_rtol": "1e-08"
+      },
+      "inner_rtol": null,
+      "model": "stokes-scaling",
+      "nprocs": 1000,
+      "pc_fallbacks": {
+        "velocity.fell_back_from_fmg": {
+          "detail": "the velocity block is running 'gamg' because no mesh hierarchy was available. Build the base mesh with refinement>=1, or adapt onto a child, to get FMG.",
+          "installed": "gamg",
+          "reason": "unavailable",
+          "requested": "custom-P geometric MG (no explicit choice was made)"
+        }
+      },
+      "petsc_int_type": "int32",
+      "placement": {
+        "n_nodes": 21,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 40
+      },
+      "res": 50,
+      "scaling": "Weak",
+      "sif": "/g/data/m18/software/containers/underworld3/underworld3-v3.2.0-20261104-254152221812.sif",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 6.768363861613728e-12,
+          "snes_fnorm_final": 6.7683638208553875e-12,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 6.755164825948481e-12,
+          "snes_fnorm_final": 6.755164701881177e-12,
           "snes_its": 1,
           "snes_reason": "CONVERGED_FNORM_ABS"
         }
@@ -818,6 +1110,188 @@
       },
       "tolerance_effective": 1e-08,
       "tolerance_requested": 1e-08,
+      "uw_version": "3.2.0"
+    }
+  },
+  "weak-scaling-2026-11-swarm": {
+    "1": {
+      "cells_global": 63643,
+      "dt": 0.020833333333333332,
+      "fill_param": 3,
+      "model": "swarm-scaling",
+      "n_steps": 10,
+      "nprocs": 1,
+      "particles_final": {
+        "global": 1272860,
+        "local_max": 1272860,
+        "local_min": 1272860
+      },
+      "particles_initial": {
+        "global": 1272860,
+        "local_max": 1272860,
+        "local_min": 1272860
+      },
+      "particles_lost": 0,
+      "pc_fallbacks": null,
+      "petsc_int_type": "int32",
+      "placement": {
+        "n_nodes": 1,
+        "ranks_per_node_max": 1,
+        "ranks_per_node_min": 1
+      },
+      "res": 24,
+      "scaling": "Weak",
+      "sif": "/g/data/m18/software/containers/underworld3/underworld3-v3.2.0-20261104-254152221812.sif",
+      "uw_version": "3.2.0"
+    },
+    "125": {
+      "cells_global": 7642528,
+      "dt": 0.004166666666666667,
+      "fill_param": 3,
+      "model": "swarm-scaling",
+      "n_steps": 10,
+      "nprocs": 125,
+      "particles_final": {
+        "global": 152819199,
+        "local_max": 1268022,
+        "local_min": 1180985
+      },
+      "particles_initial": {
+        "global": 152850560,
+        "local_max": 1268500,
+        "local_min": 1179300
+      },
+      "particles_lost": 31361,
+      "pc_fallbacks": null,
+      "petsc_int_type": "int32",
+      "placement": {
+        "n_nodes": 3,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 29
+      },
+      "res": 120,
+      "scaling": "Weak",
+      "sif": "/g/data/m18/software/containers/underworld3/underworld3-v3.2.0-20261104-254152221812.sif",
+      "uw_version": "3.2.0"
+    },
+    "27": {
+      "cells_global": 1661028,
+      "dt": 0.006944444444444444,
+      "fill_param": 3,
+      "model": "swarm-scaling",
+      "n_steps": 10,
+      "nprocs": 27,
+      "particles_final": {
+        "global": 33217388,
+        "local_max": 1256720,
+        "local_min": 1192835
+      },
+      "particles_initial": {
+        "global": 33220560,
+        "local_max": 1256320,
+        "local_min": 1193860
+      },
+      "particles_lost": 3172,
+      "pc_fallbacks": null,
+      "petsc_int_type": "int32",
+      "placement": {
+        "n_nodes": 1,
+        "ranks_per_node_max": 27,
+        "ranks_per_node_min": 27
+      },
+      "res": 72,
+      "scaling": "Weak",
+      "sif": "/g/data/m18/software/containers/underworld3/underworld3-v3.2.0-20261104-254152221812.sif",
+      "uw_version": "3.2.0"
+    },
+    "343": {
+      "cells_global": 20908421,
+      "dt": 0.002976190476190476,
+      "fill_param": 3,
+      "model": "swarm-scaling",
+      "n_steps": 10,
+      "nprocs": 343,
+      "particles_final": {
+        "global": 418063897,
+        "local_max": 1266719,
+        "local_min": 1172334
+      },
+      "particles_initial": {
+        "global": 418168420,
+        "local_max": 1267900,
+        "local_min": 1171280
+      },
+      "particles_lost": 104523,
+      "pc_fallbacks": null,
+      "petsc_int_type": "int32",
+      "placement": {
+        "n_nodes": 8,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 7
+      },
+      "res": 168,
+      "scaling": "Weak",
+      "sif": "/g/data/m18/software/containers/underworld3/underworld3-v3.2.0-20261104-254152221812.sif",
+      "uw_version": "3.2.0"
+    },
+    "64": {
+      "cells_global": 3923701,
+      "dt": 0.005208333333333333,
+      "fill_param": 3,
+      "model": "swarm-scaling",
+      "n_steps": 10,
+      "nprocs": 64,
+      "particles_final": {
+        "global": 78460844,
+        "local_max": 1271933,
+        "local_min": 1188677
+      },
+      "particles_initial": {
+        "global": 78474020,
+        "local_max": 1273200,
+        "local_min": 1189920
+      },
+      "particles_lost": 13176,
+      "pc_fallbacks": null,
+      "petsc_int_type": "int32",
+      "placement": {
+        "n_nodes": 2,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 16
+      },
+      "res": 96,
+      "scaling": "Weak",
+      "sif": "/g/data/m18/software/containers/underworld3/underworld3-v3.2.0-20261104-254152221812.sif",
+      "uw_version": "3.2.0"
+    },
+    "8": {
+      "cells_global": 497298,
+      "dt": 0.010416666666666666,
+      "fill_param": 3,
+      "model": "swarm-scaling",
+      "n_steps": 10,
+      "nprocs": 8,
+      "particles_final": {
+        "global": 9944701,
+        "local_max": 1247943,
+        "local_min": 1226520
+      },
+      "particles_initial": {
+        "global": 9945960,
+        "local_max": 1245280,
+        "local_min": 1229600
+      },
+      "particles_lost": 1259,
+      "pc_fallbacks": null,
+      "petsc_int_type": "int32",
+      "placement": {
+        "n_nodes": 1,
+        "ranks_per_node_max": 8,
+        "ranks_per_node_min": 8
+      },
+      "res": 48,
+      "scaling": "Weak",
+      "sif": "/g/data/m18/software/containers/underworld3/underworld3-v3.2.0-20261104-254152221812.sif",
       "uw_version": "3.2.0"
     }
   }

@@ -247,7 +247,8 @@ def finish(fig, suptitle, path, top=0.94):
     between the suptitle and the panels (see fig_release)."""
     fig.suptitle(suptitle, fontsize=13)
     # Reserve bottom space per caption line, or the wrapped text overlaps the x-axis labels.
-    lines = getattr(fig, "_uw_caption_lines", 1)
+    # A figure without a caption gets none.
+    lines = getattr(fig, "_uw_caption_lines", 0)
     fig.tight_layout(rect=[0, 0.02 + 0.030 * lines, 1, top])
     fig.savefig(path, dpi=150, bbox_inches="tight")
     print(f"saved {path}")

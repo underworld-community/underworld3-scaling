@@ -25,7 +25,11 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import figdata
 from fig_release import PAIRS, TITLE, version
 
-EVENT_STAGES = ["mesh_setup", "first_solve", "steady_solves"]
+# Stage order for the tables; a model's own figure stages (PAIRS) pick the event tables.
+STAGE_ORDER = ["mesh_setup", "solver_setup", "field_setup", "first_solve", "steady_solves",
+               "error_analysis", "eval_nodal", "eval_offnode", "io_write", "io_read",
+               "io_write_native", "io_read_native", "swarm_setup", "first_advect",
+               "advect_steps"]
 
 
 def pct(curr, prev):
@@ -34,8 +38,7 @@ def pct(curr, prev):
 
 def stage_table(model, prev, curr, pv, cv):
     ranks = [n for n in sorted(curr) if n in prev]
-    stages = [s for s in ("mesh_setup", "solver_setup", "first_solve", "steady_solves",
-                          "error_analysis")
+    stages = [s for s in STAGE_ORDER
               if all(s in prev[n]["stages"] and s in curr[n]["stages"] for n in ranks)]
     out = [f"### {TITLE[model]} — stage wall time, {pv} → {cv}", "",
            "| stage | " + " | ".join(str(n) for n in ranks) + " |",
@@ -86,7 +89,7 @@ def main():
     ap.add_argument("--top", type=int, default=12)
     ap.add_argument("--events", nargs="*", default=None,
                     help="model:ranks:stage triples; default every model at --ranks for "
-                         + ", ".join(EVENT_STAGES))
+                         "its fig_release stages")
     args = ap.parse_args()
 
     repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -105,7 +108,7 @@ def main():
 
         if args.events is None:
             n = args.ranks or max(n for n in curr if n in prev)
-            triples = [(model, n, s) for s in EVENT_STAGES]
+            triples = [(model, n, s) for s in PAIRS[model]["stages"]]
         else:
             triples = [(m, int(n), s) for m, n, s in (t.split(":") for t in args.events)
                        if m == model]

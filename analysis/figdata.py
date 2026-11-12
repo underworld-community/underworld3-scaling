@@ -180,6 +180,8 @@ def _load_from_export(campaign):
             key = (int(r["nprocs"]), int(r["replicate"]))
             runs[key]["info"] = info.get(r["nprocs"], {})
             runs[key]["jit_s"] = float(r.get("jit_s") or 0.0)
+            if r.get("excluded") is not None:
+                runs[key]["excluded"] = r.get("excluded") or ""
             # Rounds exported before the flag existed leave it to _flag_cold.
             if r.get("cold_jit") not in (None, ""):
                 runs[key]["cold_jit"] = bool(int(r["cold_jit"]))
@@ -217,7 +219,7 @@ def _load_from_export(campaign):
         grouped = defaultdict(list)
         for (n, _), run in sorted(runs.items()):
             grouped[n].append(run)
-        return _aggregate(grouped)
+        return _aggregate(grouped, campaign)
     return None
 
 
@@ -256,7 +258,7 @@ def load(campaign_dir, pattern="*_out/*", from_raw=False):
         if r and r["info"].get("nprocs"):
             runs[r["info"]["nprocs"]].append(r)
 
-    out = _aggregate(runs)
+    out = _aggregate(runs, campaign)
 
     os.makedirs(CACHE_DIR, exist_ok=True)
     try:
@@ -279,6 +281,17 @@ COLD_EXCESS_S = 1.0
 COLD_RATIO = 3.0
 
 
+# Replicates excluded by hand, with the reason the export records. Only for a run that is
+# demonstrably not a measurement of the code: a slow node shows as EVERY event slower at
+# identical call counts while the other replicates agree. Keyed by (campaign, nprocs,
+# replicate index in sorted run-dir order). The raw run stays in the export, flagged.
+EXCLUDE = {
+    ("weak-scaling-2026-11-swarm", 343, 2):
+        "slow node: every event 3-10x slower at identical call counts "
+        "(KDTree.query 431 -> 1991 s, rbf 93 -> 925 s); replicates 1 and 3 agree at 1403 / 1400 s",
+}
+
+
 def _flag_cold(reps):
     """Set rep["cold_jit"] on replicates that lack it (an export carries the flag)."""
     unflagged = [r for r in reps if "cold_jit" not in r]
@@ -290,7 +303,7 @@ def _flag_cold(reps):
         r["cold_jit"] = (j - jit_min > COLD_EXCESS_S) and (j > COLD_RATIO * jit_min)
 
 
-def _aggregate(runs):
+def _aggregate(runs, campaign=""):
     """{nprocs: [run, ...]} -> the public structure. Shared by both load paths.
 
     Kept as one function so the exported CSVs and the raw logs cannot drift into producing
@@ -299,15 +312,18 @@ def _aggregate(runs):
     out = {}
     for n, reps_all in sorted(runs.items()):
         _flag_cold(reps_all)
-        # Cold replicates are left out of the mean and the spread but kept in reps_all so
-        # the export records them. When every replicate is cold there is nothing better to
-        # show; they are used and n_cold says so.
-        warm = [r for r in reps_all if not r["cold_jit"]]
+        for i, r in enumerate(reps_all, start=1):
+            r.setdefault("excluded", EXCLUDE.get((campaign, n, i), ""))
+        # Cold and hand-excluded replicates are left out of the mean and the spread but
+        # kept in reps_all so the export records them. When every replicate is out there
+        # is nothing better to show; they are used and n_cold says so.
+        warm = [r for r in reps_all if not r["cold_jit"] and not r["excluded"]]
         reps = warm or reps_all
         stage_names = set().union(*(set(r["stages"]) for r in reps))
         out[n] = {
             "n_replicates": len(reps),
-            "n_cold": len(reps_all) - len(warm),
+            "n_cold": sum(1 for r in reps_all if r["cold_jit"]),
+            "n_excluded": sum(1 for r in reps_all if r["excluded"] and not r["cold_jit"]),
             "reps_all": reps_all,
             "info": reps[0]["info"],
             "events": reps[0]["events"],

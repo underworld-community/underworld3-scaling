@@ -62,7 +62,7 @@ CAMPAIGNS = [
 # jit_s / cold_jit: rank 0's JIT compile time and whether figdata treats the replicate as
 # cold-cache (excluded from means). Recorded rather than dropped: the archive is the record.
 RUN_COLS = ["campaign", "site", "model", "nprocs", "res", "replicate", "ranks_per_node",
-            "jit_s", "cold_jit"]
+            "jit_s", "cold_jit", "excluded"]
 STAGE_COLS = ["campaign", "nprocs", "replicate", "stage",
               "time", "time_rank0", "messages", "reductions", "flop"]
 EVENT_COLS = ["campaign", "nprocs", "replicate", "stage", "event",
@@ -130,6 +130,7 @@ def main():
                     "ranks_per_node": rpn if rpn else "",
                     "jit_s": round(rep.get("jit_s", 0.0), 4),
                     "cold_jit": int(rep.get("cold_jit", False)),
+                    "excluded": rep.get("excluded", ""),
                 })
                 for s, v in sorted(rep["stages"].items()):
                     stages.append({
@@ -204,6 +205,10 @@ def main():
     total = sum(os.path.getsize(os.path.join(outdir, f)) for f in os.listdir(outdir))
     print(f"exported to {outdir}")
     print(f"  {len(runs)} runs, {len(stages)} stage rows, {len(events)} event rows")
+    for r in runs:
+        if r["excluded"]:
+            print(f"  excluded: {r['campaign']} nprocs={r['nprocs']} replicate={r['replicate']}: "
+                  f"{r['excluded']}")
     cold = [r for r in runs if r["cold_jit"]]
     if cold:
         print(f"  {len(cold)} cold-JIT replicates flagged (excluded from means):")
