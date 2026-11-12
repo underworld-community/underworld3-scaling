@@ -1,6 +1,8 @@
 #!/bin/bash
 # Optional argument: a params file layered on params.sh (e.g. params-stokes.sh), so models
 # with different BASE/tolerance can be launched without editing params.sh in between.
+# With UW_EMIT_DIR set, nothing is submitted: one job script per run is written there (see
+# the emit block below) for submission through the uw3-hpc MCP.
 source "${1:-params.sh}"
 
 if (($SCALING_TYPE==1)); then
@@ -99,6 +101,30 @@ do
                 MEMORY="$((NNODES * MEM_PER_NODE))GB"
                 GADI_LAUNCHER="gadi_baremetal_go.sh"
                 [ "${USE_CONTAINER:-0}" = "1" ] && GADI_LAUNCHER="gadi_container_go.sh"
+
+                # Emit mode: write one self-contained job script per run instead of calling
+                # qsub, for a submission path that takes scripts rather than a command line
+                # (the uw3-hpc MCP's `submit`). The script carries what `qsub -v` would have:
+                # every EXPORTVARS value, the working directory, and the go script. Resources
+                # are printed for the submitter; the MCP checks 190 GB per node, not 192.
+                if [ -n "${UW_EMIT_DIR:-}" ]; then
+                    mkdir -p "${UW_EMIT_DIR}"
+                    script="${UW_EMIT_DIR}/${UW_MODEL%-scaling}-j${JOB_IDX}-i${RUN_IDX}.sh"
+                    {
+                        echo '#!/bin/bash -l'
+                        echo "#PBS -P ${ACCOUNT}"
+                        echo '#PBS -l storage=gdata/m18+scratch/m18+scratch/el06'
+                        echo '#PBS -j oe'
+                        for v in ${EXPORTVARS//,/ }; do
+                            printf 'export %s=%q\n' "${v}" "${!v}"
+                        done
+                        echo "cd $(pwd)"
+                        echo "bash ${GADI_LAUNCHER}"
+                    } > "${script}"
+                    echo "EMIT $(basename "${script}") cores=${PBSTASKS} memory_gb=$((NNODES * 190)) walltime=${WALLTIME}"
+                    continue
+                fi
+
                 CMD="qsub -v ${EXPORTVARS} -N ${UW_MODEL} -l storage=gdata/m18+scratch/m18+scratch/el06,ncpus=${PBSTASKS},mem=${MEMORY},walltime=${WALLTIME},wd -P ${ACCOUNT} -q ${QUEUE} ${GADI_LAUNCHER}"
                 echo ${CMD}
                 ${CMD}
