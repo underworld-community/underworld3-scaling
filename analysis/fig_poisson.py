@@ -35,7 +35,7 @@ STAGES = ["mesh_setup", "first_solve", "steady_solves", "error_analysis"]
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--outdir", default="figures")
+    ap.add_argument("--outdir", default="investigations/figures")
     ap.add_argument("--campaign", default=CAMPAIGN)
     args = ap.parse_args()
 

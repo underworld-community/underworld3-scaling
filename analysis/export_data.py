@@ -53,9 +53,16 @@ CAMPAIGNS = [
     "weak-scaling-2026-stokes-BASE5-innerscan/1e-6",
     "weak-scaling-2026-stokes-BASE10",
     "weak-scaling-2026-stokes-BASE10-spread",
+    # Benchmark v2 (barriers, .msh.h5) on the same v3.1.0 container: the evaluate
+    # retraction and the mesh-cache figure read these. Same environment, so same round.
+    "weak-scaling-2026-evalbarrier",
+    "weak-scaling-2026-h5mesh",
 ]
 
-RUN_COLS = ["campaign", "site", "model", "nprocs", "res", "replicate", "ranks_per_node"]
+# jit_s / cold_jit: rank 0's JIT compile time and whether figdata treats the replicate as
+# cold-cache (excluded from means). Recorded rather than dropped: the archive is the record.
+RUN_COLS = ["campaign", "site", "model", "nprocs", "res", "replicate", "ranks_per_node",
+            "jit_s", "cold_jit"]
 STAGE_COLS = ["campaign", "nprocs", "replicate", "stage",
               "time", "time_rank0", "messages", "reductions", "flop"]
 EVENT_COLS = ["campaign", "nprocs", "replicate", "stage", "event",
@@ -87,6 +94,8 @@ def main():
     # --benchmark-version 1 explicitly when re-exporting a pre-barrier round.
     ap.add_argument("--benchmark-version", type=int, default=2)
     ap.add_argument("--benchmark-note", default="")
+    ap.add_argument("--campaigns", nargs="+", default=None,
+                    help="campaign directories to export (default: the CAMPAIGNS list)")
     args = ap.parse_args()
 
     cores_per_node = args.cores_per_node or {"gadi": 48, "setonix": 128}[args.site]
@@ -98,8 +107,10 @@ def main():
     runs, stages, events, info = [], [], [], {}
     missing = []
 
-    for campaign in CAMPAIGNS:
-        data = figdata.load(os.path.join(repo, campaign))
+    for campaign in args.campaigns or CAMPAIGNS:
+        # Always from the raw logs: with an export already on disk, load() would hand back
+        # that export and the re-export could never pick up a new column.
+        data = figdata.load(os.path.join(repo, campaign), from_raw=True)
         if not data:
             missing.append(campaign)
             continue
@@ -108,7 +119,7 @@ def main():
             entry = data[n]
             info[campaign][str(n)] = entry["info"]
             rpn = (entry["info"].get("placement") or {}).get("ranks_per_node_max")
-            for i, rep in enumerate(entry["reps"], start=1):
+            for i, rep in enumerate(entry["reps_all"], start=1):
                 runs.append({
                     "campaign": campaign,
                     "site": args.site,
@@ -117,6 +128,8 @@ def main():
                     "res": rep["info"].get("res", ""),
                     "replicate": i,
                     "ranks_per_node": rpn if rpn else "",
+                    "jit_s": round(rep.get("jit_s", 0.0), 4),
+                    "cold_jit": int(rep.get("cold_jit", False)),
                 })
                 for s, v in sorted(rep["stages"].items()):
                     stages.append({
@@ -178,6 +191,7 @@ def main():
         "campaigns": sorted(info),
         "missing_campaigns": missing,
         "n_runs": len(runs),
+        "n_cold_jit_runs": sum(r["cold_jit"] for r in runs),
         "raw_output_note": (
             "Raw PETSc logs (5.8 GB, one 423 MB file at 2197 ranks) lived under "
             "/scratch/el06/jg0883 on Gadi and are subject to scratch purging. This "
@@ -190,6 +204,12 @@ def main():
     total = sum(os.path.getsize(os.path.join(outdir, f)) for f in os.listdir(outdir))
     print(f"exported to {outdir}")
     print(f"  {len(runs)} runs, {len(stages)} stage rows, {len(events)} event rows")
+    cold = [r for r in runs if r["cold_jit"]]
+    if cold:
+        print(f"  {len(cold)} cold-JIT replicates flagged (excluded from means):")
+        for r in cold:
+            print(f"    {r['campaign']} nprocs={r['nprocs']} replicate={r['replicate']} "
+                  f"jit_s={r['jit_s']}")
     print(f"  {total/1e6:.1f} MB total")
     if missing:
         print(f"  MISSING (not on disk): {', '.join(missing)}")

@@ -2,8 +2,8 @@
 #PBS -N mesh_generate
 #PBS -q normal
 #PBS -l ncpus=1
-#PBS -l mem=32GB
-#PBS -l walltime=02:00:00
+#PBS -l mem=64GB
+#PBS -l walltime=04:00:00
 #PBS -l storage=scratch/el06+gdata/m18
 #PBS -P el06
 #PBS -j oe
@@ -24,8 +24,8 @@ module load singularity
 # One line per mesh family this round, "model:base:jobs" — independent of params.sh,
 # whose BASE only describes the box models.
 MESH_SETS=(
-    "poisson-scaling:24:1 2 3 4 5 7"
-    "stokes-scaling:5:1 2 3 4 5 7"
+    "poisson-scaling:24:1 2 3 4 5 7 10"
+    "stokes-scaling:5:1 2 3 4 5 7 10"
 )
 
 echo "=== Mesh pre-generation ==="

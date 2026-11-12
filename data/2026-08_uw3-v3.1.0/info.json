@@ -765,6 +765,208 @@
       "scaling": "Weak"
     }
   },
+  "weak-scaling-2026-evalbarrier": {
+    "1": {
+      "checkpoint_bytes": 18526840,
+      "checkpoint_bytes_native": 88715452,
+      "eval_offnode_max_err": 0.0212830249930408,
+      "eval_offnode_nonfinite": 0,
+      "model": "checkpoint-scaling",
+      "n_eval_points": 12300,
+      "nprocs": 1,
+      "placement": {
+        "n_nodes": 1,
+        "ranks_per_node_max": 1,
+        "ranks_per_node_min": 1
+      },
+      "res": 24,
+      "roundtrip_T_err": 0.0,
+      "roundtrip_T_err_native": 0.0,
+      "roundtrip_p_err": 0.0,
+      "roundtrip_p_err_native": 0.0,
+      "roundtrip_v_err": 0.0,
+      "roundtrip_v_err_native": 0.0,
+      "scaling": "Weak"
+    },
+    "125": {
+      "checkpoint_bytes": 2077870616,
+      "checkpoint_bytes_native": 10196460844,
+      "eval_offnode_max_err": 0.006121442624039464,
+      "eval_offnode_nonfinite": 0,
+      "model": "checkpoint-scaling",
+      "n_eval_points": 1431955,
+      "nprocs": 125,
+      "placement": {
+        "n_nodes": 3,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 29
+      },
+      "res": 120,
+      "roundtrip_T_err": 0.0,
+      "roundtrip_T_err_native": 1.0,
+      "roundtrip_p_err": 0.0,
+      "roundtrip_p_err_native": 0.9999368868977868,
+      "roundtrip_v_err": 0.0,
+      "roundtrip_v_err_native": 1.999606536688873,
+      "scaling": "Weak"
+    },
+    "27": {
+      "checkpoint_bytes": 456042616,
+      "checkpoint_bytes_native": 2231038676,
+      "eval_offnode_max_err": 0.010158411511337062,
+      "eval_offnode_nonfinite": 0,
+      "model": "checkpoint-scaling",
+      "n_eval_points": 313857,
+      "nprocs": 27,
+      "placement": {
+        "n_nodes": 1,
+        "ranks_per_node_max": 27,
+        "ranks_per_node_min": 27
+      },
+      "res": 72,
+      "roundtrip_T_err": 0.0,
+      "roundtrip_T_err_native": 1.0,
+      "roundtrip_p_err": 0.0,
+      "roundtrip_p_err_native": 0.9999492597788322,
+      "roundtrip_v_err": 0.0,
+      "roundtrip_v_err_native": 1.9997586063308987,
+      "scaling": "Weak"
+    },
+    "343": {
+      "checkpoint_bytes": 5660900230,
+      "checkpoint_bytes_native": 27993276520,
+      "eval_offnode_max_err": 0.004394456246226031,
+      "eval_offnode_nonfinite": 0,
+      "model": "checkpoint-scaling",
+      "n_eval_points": 3900997,
+      "nprocs": 343,
+      "placement": {
+        "n_nodes": 8,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 7
+      },
+      "res": 168,
+      "roundtrip_T_err": 0.0,
+      "roundtrip_T_err_native": 1.0,
+      "roundtrip_p_err": 0.0,
+      "roundtrip_p_err_native": 0.999982762955746,
+      "roundtrip_v_err": 0.0,
+      "roundtrip_v_err_native": 1.9994316818745708,
+      "scaling": "Weak"
+    },
+    "64": {
+      "checkpoint_bytes": 1070964188,
+      "checkpoint_bytes_native": 5248302648,
+      "eval_offnode_max_err": 0.007669029044590436,
+      "eval_offnode_nonfinite": 0,
+      "model": "checkpoint-scaling",
+      "n_eval_points": 735132,
+      "nprocs": 64,
+      "placement": {
+        "n_nodes": 2,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 16
+      },
+      "res": 96,
+      "roundtrip_T_err": 0.0,
+      "roundtrip_T_err_native": 1.0,
+      "roundtrip_p_err": 0.0,
+      "roundtrip_p_err_native": 0.9998901656801334,
+      "roundtrip_v_err": 0.0,
+      "roundtrip_v_err_native": 1.9996653526136425,
+      "scaling": "Weak"
+    },
+    "8": {
+      "checkpoint_bytes": 138442586,
+      "checkpoint_bytes_native": 673969452,
+      "eval_offnode_max_err": 0.01486295123509318,
+      "eval_offnode_nonfinite": 0,
+      "model": "checkpoint-scaling",
+      "n_eval_points": 94312,
+      "nprocs": 8,
+      "placement": {
+        "n_nodes": 1,
+        "ranks_per_node_max": 8,
+        "ranks_per_node_min": 8
+      },
+      "res": 48,
+      "roundtrip_T_err": 0.0,
+      "roundtrip_T_err_native": 1.0,
+      "roundtrip_p_err": 0.0,
+      "roundtrip_p_err_native": 0.9999466181166378,
+      "roundtrip_v_err": 0.0,
+      "roundtrip_v_err_native": 1.9991111541976407,
+      "scaling": "Weak"
+    }
+  },
+  "weak-scaling-2026-h5mesh": {
+    "1": {
+      "checkpoint_bytes": 18526840,
+      "checkpoint_bytes_native": 88715452,
+      "eval_offnode_max_err": 0.0212830249930408,
+      "eval_offnode_nonfinite": 0,
+      "model": "checkpoint-scaling",
+      "n_eval_points": 12300,
+      "nprocs": 1,
+      "placement": {
+        "n_nodes": 1,
+        "ranks_per_node_max": 1,
+        "ranks_per_node_min": 1
+      },
+      "res": 24,
+      "roundtrip_T_err": 0.0,
+      "roundtrip_T_err_native": 0.0,
+      "roundtrip_p_err": 0.0,
+      "roundtrip_p_err_native": 0.0,
+      "roundtrip_v_err": 0.0,
+      "roundtrip_v_err_native": 0.0,
+      "scaling": "Weak"
+    },
+    "343": {
+      "checkpoint_bytes": 5660900230,
+      "checkpoint_bytes_native": 27993276520,
+      "eval_offnode_max_err": 0.004394456246226031,
+      "eval_offnode_nonfinite": 0,
+      "model": "checkpoint-scaling",
+      "n_eval_points": 3900997,
+      "nprocs": 343,
+      "placement": {
+        "n_nodes": 8,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 7
+      },
+      "res": 168,
+      "roundtrip_T_err": 0.0,
+      "roundtrip_T_err_native": 1.0,
+      "roundtrip_p_err": 0.0,
+      "roundtrip_p_err_native": 0.999982762955746,
+      "roundtrip_v_err": 0.0,
+      "roundtrip_v_err_native": 1.9994316818745708,
+      "scaling": "Weak"
+    },
+    "8": {
+      "checkpoint_bytes": 138442586,
+      "checkpoint_bytes_native": 673969452,
+      "eval_offnode_max_err": 0.01486295123509318,
+      "eval_offnode_nonfinite": 0,
+      "model": "checkpoint-scaling",
+      "n_eval_points": 94312,
+      "nprocs": 8,
+      "placement": {
+        "n_nodes": 1,
+        "ranks_per_node_max": 8,
+        "ranks_per_node_min": 8
+      },
+      "res": 48,
+      "roundtrip_T_err": 0.0,
+      "roundtrip_T_err_native": 1.0,
+      "roundtrip_p_err": 0.0,
+      "roundtrip_p_err_native": 0.9999466181166378,
+      "roundtrip_v_err": 0.0,
+      "roundtrip_v_err_native": 1.9991111541976407,
+      "scaling": "Weak"
+    }
+  },
   "weak-scaling-2026-poisson-analytic": {
     "1": {
       "init_state": "analytic",

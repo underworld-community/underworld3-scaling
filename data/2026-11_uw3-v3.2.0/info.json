@@ -1,0 +1,824 @@
+{
+  "weak-scaling-2026-11-advdiff": {
+    "1": {
+      "dt": 0.020833333333333332,
+      "effective_options": {
+        "ksp_atol": "1e-50",
+        "ksp_max_it": "10",
+        "ksp_rtol": "1e-50",
+        "pc_type": "gamg",
+        "snes_atol": "1e-50",
+        "snes_ksp_ew": null,
+        "snes_max_it": "10",
+        "snes_rtol": "1e-50"
+      },
+      "max_drift_from_initial": 1.2244845510575867e-16,
+      "model": "advdiff-scaling",
+      "monotone_mode": null,
+      "n_steady_steps": 10,
+      "nprocs": 1,
+      "pc_fallbacks": {},
+      "petsc_int_type": "int32",
+      "placement": {
+        "n_nodes": 1,
+        "ranks_per_node_max": 1,
+        "ranks_per_node_min": 1
+      },
+      "res": 24,
+      "scaling": "Weak",
+      "sif": "/g/data/m18/software/containers/underworld3/underworld3-v3.2.0-20261104-254152221812.sif",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 10,
+          "ksp_its_total": 10,
+          "ksp_reason": "DIVERGED_MAX_IT",
+          "ksp_rnorm_final": 1.2038232550010179e-05,
+          "snes_fnorm_final": 0.05373948442916445,
+          "snes_its": 0,
+          "snes_reason": "DIVERGED_LINEAR_SOLVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 10,
+          "ksp_its_total": 0,
+          "ksp_reason": "DIVERGED_MAX_IT",
+          "ksp_rnorm_final": 1.1954801080887542e-05,
+          "n_timesteps": 10,
+          "snes_fnorm_final": 0.05373948442916446,
+          "snes_its": 0,
+          "snes_reason": "DIVERGED_LINEAR_SOLVE"
+        }
+      },
+      "theta": 1.0,
+      "tol": 1e-50,
+      "uw_version": "3.2.0"
+    },
+    "125": {
+      "dt": 0.004166666666666667,
+      "effective_options": {
+        "ksp_atol": "1e-50",
+        "ksp_max_it": "10",
+        "ksp_rtol": "1e-50",
+        "pc_type": "gamg",
+        "snes_atol": "1e-50",
+        "snes_ksp_ew": null,
+        "snes_max_it": "10",
+        "snes_rtol": "1e-50"
+      },
+      "max_drift_from_initial": 1.2246217625329842e-16,
+      "model": "advdiff-scaling",
+      "monotone_mode": null,
+      "n_steady_steps": 10,
+      "nprocs": 125,
+      "pc_fallbacks": {},
+      "petsc_int_type": "int32",
+      "placement": {
+        "n_nodes": 3,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 29
+      },
+      "res": 120,
+      "scaling": "Weak",
+      "sif": "/g/data/m18/software/containers/underworld3/underworld3-v3.2.0-20261104-254152221812.sif",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 10,
+          "ksp_its_total": 10,
+          "ksp_reason": "DIVERGED_MAX_IT",
+          "ksp_rnorm_final": 2.8457313505252736e-05,
+          "snes_fnorm_final": 0.004831555646302892,
+          "snes_its": 0,
+          "snes_reason": "DIVERGED_LINEAR_SOLVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 10,
+          "ksp_its_total": 0,
+          "ksp_reason": "DIVERGED_MAX_IT",
+          "ksp_rnorm_final": 2.8472360512553778e-05,
+          "n_timesteps": 10,
+          "snes_fnorm_final": 0.004831555646029571,
+          "snes_its": 0,
+          "snes_reason": "DIVERGED_LINEAR_SOLVE"
+        }
+      },
+      "theta": 1.0,
+      "tol": 1e-50,
+      "uw_version": "3.2.0"
+    },
+    "27": {
+      "dt": 0.006944444444444444,
+      "effective_options": {
+        "ksp_atol": "1e-50",
+        "ksp_max_it": "10",
+        "ksp_rtol": "1e-50",
+        "pc_type": "gamg",
+        "snes_atol": "1e-50",
+        "snes_ksp_ew": null,
+        "snes_max_it": "10",
+        "snes_rtol": "1e-50"
+      },
+      "max_drift_from_initial": 1.2245697498262189e-16,
+      "model": "advdiff-scaling",
+      "monotone_mode": null,
+      "n_steady_steps": 10,
+      "nprocs": 27,
+      "pc_fallbacks": {},
+      "petsc_int_type": "int32",
+      "placement": {
+        "n_nodes": 1,
+        "ranks_per_node_max": 27,
+        "ranks_per_node_min": 27
+      },
+      "res": 72,
+      "scaling": "Weak",
+      "sif": "/g/data/m18/software/containers/underworld3/underworld3-v3.2.0-20261104-254152221812.sif",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 10,
+          "ksp_its_total": 10,
+          "ksp_reason": "DIVERGED_MAX_IT",
+          "ksp_rnorm_final": 2.8861541861326927e-05,
+          "snes_fnorm_final": 0.010388402167147795,
+          "snes_its": 0,
+          "snes_reason": "DIVERGED_LINEAR_SOLVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 10,
+          "ksp_its_total": 0,
+          "ksp_reason": "DIVERGED_MAX_IT",
+          "ksp_rnorm_final": 2.8601189747995503e-05,
+          "n_timesteps": 10,
+          "snes_fnorm_final": 0.010388402155817034,
+          "snes_its": 0,
+          "snes_reason": "DIVERGED_LINEAR_SOLVE"
+        }
+      },
+      "theta": 1.0,
+      "tol": 1e-50,
+      "uw_version": "3.2.0"
+    },
+    "343": {
+      "dt": 0.002976190476190476,
+      "effective_options": {
+        "ksp_atol": "1e-50",
+        "ksp_max_it": "10",
+        "ksp_rtol": "1e-50",
+        "pc_type": "gamg",
+        "snes_atol": "1e-50",
+        "snes_ksp_ew": null,
+        "snes_max_it": "10",
+        "snes_rtol": "1e-50"
+      },
+      "max_drift_from_initial": 1.2246467948801548e-16,
+      "model": "advdiff-scaling",
+      "monotone_mode": null,
+      "n_steady_steps": 10,
+      "nprocs": 343,
+      "pc_fallbacks": {},
+      "petsc_int_type": "int32",
+      "placement": {
+        "n_nodes": 8,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 7
+      },
+      "res": 168,
+      "scaling": "Weak",
+      "sif": "/g/data/m18/software/containers/underworld3/underworld3-v3.2.0-20261104-254152221812.sif",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 10,
+          "ksp_its_total": 10,
+          "ksp_reason": "DIVERGED_MAX_IT",
+          "ksp_rnorm_final": 2.8956170324253496e-05,
+          "snes_fnorm_final": 0.002916727930680028,
+          "snes_its": 0,
+          "snes_reason": "DIVERGED_LINEAR_SOLVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 10,
+          "ksp_its_total": 0,
+          "ksp_reason": "DIVERGED_MAX_IT",
+          "ksp_rnorm_final": 2.8817413071567188e-05,
+          "n_timesteps": 10,
+          "snes_fnorm_final": 0.0029167279309038657,
+          "snes_its": 0,
+          "snes_reason": "DIVERGED_LINEAR_SOLVE"
+        }
+      },
+      "theta": 1.0,
+      "tol": 1e-50,
+      "uw_version": "3.2.0"
+    },
+    "64": {
+      "dt": 0.005208333333333333,
+      "effective_options": {
+        "ksp_atol": "1e-50",
+        "ksp_max_it": "10",
+        "ksp_rtol": "1e-50",
+        "pc_type": "gamg",
+        "snes_atol": "1e-50",
+        "snes_ksp_ew": null,
+        "snes_max_it": "10",
+        "snes_rtol": "1e-50"
+      },
+      "max_drift_from_initial": 1.2246030946411909e-16,
+      "model": "advdiff-scaling",
+      "monotone_mode": null,
+      "n_steady_steps": 10,
+      "nprocs": 64,
+      "pc_fallbacks": {},
+      "petsc_int_type": "int32",
+      "placement": {
+        "n_nodes": 2,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 16
+      },
+      "res": 96,
+      "scaling": "Weak",
+      "sif": "/g/data/m18/software/containers/underworld3/underworld3-v3.2.0-20261104-254152221812.sif",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 10,
+          "ksp_its_total": 10,
+          "ksp_reason": "DIVERGED_MAX_IT",
+          "ksp_rnorm_final": 2.8739463295407237e-05,
+          "snes_fnorm_final": 0.006752122681940414,
+          "snes_its": 0,
+          "snes_reason": "DIVERGED_LINEAR_SOLVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 10,
+          "ksp_its_total": 0,
+          "ksp_reason": "DIVERGED_MAX_IT",
+          "ksp_rnorm_final": 2.8593245770904285e-05,
+          "n_timesteps": 10,
+          "snes_fnorm_final": 0.006752122684150815,
+          "snes_its": 0,
+          "snes_reason": "DIVERGED_LINEAR_SOLVE"
+        }
+      },
+      "theta": 1.0,
+      "tol": 1e-50,
+      "uw_version": "3.2.0"
+    },
+    "8": {
+      "dt": 0.010416666666666666,
+      "effective_options": {
+        "ksp_atol": "1e-50",
+        "ksp_max_it": "10",
+        "ksp_rtol": "1e-50",
+        "pc_type": "gamg",
+        "snes_atol": "1e-50",
+        "snes_ksp_ew": null,
+        "snes_max_it": "10",
+        "snes_rtol": "1e-50"
+      },
+      "max_drift_from_initial": 1.2244845510575975e-16,
+      "model": "advdiff-scaling",
+      "monotone_mode": null,
+      "n_steady_steps": 10,
+      "nprocs": 8,
+      "pc_fallbacks": {},
+      "petsc_int_type": "int32",
+      "placement": {
+        "n_nodes": 1,
+        "ranks_per_node_max": 8,
+        "ranks_per_node_min": 8
+      },
+      "res": 48,
+      "scaling": "Weak",
+      "sif": "/g/data/m18/software/containers/underworld3/underworld3-v3.2.0-20261104-254152221812.sif",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 10,
+          "ksp_its_total": 10,
+          "ksp_reason": "DIVERGED_MAX_IT",
+          "ksp_rnorm_final": 2.144007671484029e-05,
+          "snes_fnorm_final": 0.01904132508768424,
+          "snes_its": 0,
+          "snes_reason": "DIVERGED_LINEAR_SOLVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 10,
+          "ksp_its_total": 0,
+          "ksp_reason": "DIVERGED_MAX_IT",
+          "ksp_rnorm_final": 2.1321632601437523e-05,
+          "n_timesteps": 10,
+          "snes_fnorm_final": 0.019041325099270673,
+          "snes_its": 0,
+          "snes_reason": "DIVERGED_LINEAR_SOLVE"
+        }
+      },
+      "theta": 1.0,
+      "tol": 1e-50,
+      "uw_version": "3.2.0"
+    }
+  },
+  "weak-scaling-2026-11-poisson": {
+    "1": {
+      "effective_options": {
+        "ksp_atol": "1e-50",
+        "ksp_max_it": "10",
+        "ksp_rtol": "1e-50",
+        "ksp_type": "gmres",
+        "pc_type": "gamg",
+        "snes_atol": "1e-50",
+        "snes_max_it": "10",
+        "snes_rtol": "1e-50"
+      },
+      "init_state": "zero",
+      "model": "poisson-scaling",
+      "nprocs": 1,
+      "pc_fallbacks": {},
+      "petsc_int_type": "int32",
+      "placement": {
+        "n_nodes": 1,
+        "ranks_per_node_max": 1,
+        "ranks_per_node_min": 1
+      },
+      "rel_norm": 1.0,
+      "res": 24,
+      "scaling": "Weak",
+      "sif": "/g/data/m18/software/containers/underworld3/underworld3-v3.2.0-20261104-254152221812.sif",
+      "uw_version": "3.2.0"
+    },
+    "125": {
+      "effective_options": {
+        "ksp_atol": "1e-50",
+        "ksp_max_it": "10",
+        "ksp_rtol": "1e-50",
+        "ksp_type": "gmres",
+        "pc_type": "gamg",
+        "snes_atol": "1e-50",
+        "snes_max_it": "10",
+        "snes_rtol": "1e-50"
+      },
+      "init_state": "zero",
+      "model": "poisson-scaling",
+      "nprocs": 125,
+      "pc_fallbacks": {},
+      "petsc_int_type": "int32",
+      "placement": {
+        "n_nodes": 3,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 29
+      },
+      "rel_norm": 1.0,
+      "res": 120,
+      "scaling": "Weak",
+      "sif": "/g/data/m18/software/containers/underworld3/underworld3-v3.2.0-20261104-254152221812.sif",
+      "uw_version": "3.2.0"
+    },
+    "27": {
+      "effective_options": {
+        "ksp_atol": "1e-50",
+        "ksp_max_it": "10",
+        "ksp_rtol": "1e-50",
+        "ksp_type": "gmres",
+        "pc_type": "gamg",
+        "snes_atol": "1e-50",
+        "snes_max_it": "10",
+        "snes_rtol": "1e-50"
+      },
+      "init_state": "zero",
+      "model": "poisson-scaling",
+      "nprocs": 27,
+      "pc_fallbacks": {},
+      "petsc_int_type": "int32",
+      "placement": {
+        "n_nodes": 1,
+        "ranks_per_node_max": 27,
+        "ranks_per_node_min": 27
+      },
+      "rel_norm": 1.0,
+      "res": 72,
+      "scaling": "Weak",
+      "sif": "/g/data/m18/software/containers/underworld3/underworld3-v3.2.0-20261104-254152221812.sif",
+      "uw_version": "3.2.0"
+    },
+    "343": {
+      "effective_options": {
+        "ksp_atol": "1e-50",
+        "ksp_max_it": "10",
+        "ksp_rtol": "1e-50",
+        "ksp_type": "gmres",
+        "pc_type": "gamg",
+        "snes_atol": "1e-50",
+        "snes_max_it": "10",
+        "snes_rtol": "1e-50"
+      },
+      "init_state": "zero",
+      "model": "poisson-scaling",
+      "nprocs": 343,
+      "pc_fallbacks": {},
+      "petsc_int_type": "int32",
+      "placement": {
+        "n_nodes": 8,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 7
+      },
+      "rel_norm": 1.0,
+      "res": 168,
+      "scaling": "Weak",
+      "sif": "/g/data/m18/software/containers/underworld3/underworld3-v3.2.0-20261104-254152221812.sif",
+      "uw_version": "3.2.0"
+    },
+    "64": {
+      "effective_options": {
+        "ksp_atol": "1e-50",
+        "ksp_max_it": "10",
+        "ksp_rtol": "1e-50",
+        "ksp_type": "gmres",
+        "pc_type": "gamg",
+        "snes_atol": "1e-50",
+        "snes_max_it": "10",
+        "snes_rtol": "1e-50"
+      },
+      "init_state": "zero",
+      "model": "poisson-scaling",
+      "nprocs": 64,
+      "pc_fallbacks": {},
+      "petsc_int_type": "int32",
+      "placement": {
+        "n_nodes": 2,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 16
+      },
+      "rel_norm": 1.0,
+      "res": 96,
+      "scaling": "Weak",
+      "sif": "/g/data/m18/software/containers/underworld3/underworld3-v3.2.0-20261104-254152221812.sif",
+      "uw_version": "3.2.0"
+    },
+    "8": {
+      "effective_options": {
+        "ksp_atol": "1e-50",
+        "ksp_max_it": "10",
+        "ksp_rtol": "1e-50",
+        "ksp_type": "gmres",
+        "pc_type": "gamg",
+        "snes_atol": "1e-50",
+        "snes_max_it": "10",
+        "snes_rtol": "1e-50"
+      },
+      "init_state": "zero",
+      "model": "poisson-scaling",
+      "nprocs": 8,
+      "pc_fallbacks": {},
+      "petsc_int_type": "int32",
+      "placement": {
+        "n_nodes": 1,
+        "ranks_per_node_max": 8,
+        "ranks_per_node_min": 8
+      },
+      "rel_norm": 1.0,
+      "res": 48,
+      "scaling": "Weak",
+      "sif": "/g/data/m18/software/containers/underworld3/underworld3-v3.2.0-20261104-254152221812.sif",
+      "uw_version": "3.2.0"
+    }
+  },
+  "weak-scaling-2026-11-stokes": {
+    "1": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-09",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.3e-10",
+        "ksp_atol": "1e-14",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "3",
+        "snes_rtol": "1e-08"
+      },
+      "inner_rtol": null,
+      "model": "stokes-scaling",
+      "nprocs": 1,
+      "pc_fallbacks": {
+        "velocity.fell_back_from_fmg": {
+          "detail": "the velocity block is running 'gamg' because no mesh hierarchy was available. Build the base mesh with refinement>=1, or adapt onto a child, to get FMG.",
+          "installed": "gamg",
+          "reason": "unavailable",
+          "requested": "custom-P geometric MG (no explicit choice was made)"
+        }
+      },
+      "petsc_int_type": "int32",
+      "placement": {
+        "n_nodes": 1,
+        "ranks_per_node_max": 1,
+        "ranks_per_node_min": 1
+      },
+      "res": 5,
+      "scaling": "Weak",
+      "sif": "/g/data/m18/software/containers/underworld3/underworld3-v3.2.0-20261104-254152221812.sif",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 2.5677478798654462e-11,
+          "snes_fnorm_final": 2.567747882890425e-11,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 2.5611704021146644e-11,
+          "snes_fnorm_final": 2.5611704281993588e-11,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_ABS"
+        }
+      },
+      "tolerance_effective": 1e-08,
+      "tolerance_requested": 1e-08,
+      "uw_version": "3.2.0"
+    },
+    "125": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-09",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.3e-10",
+        "ksp_atol": "1e-14",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "3",
+        "snes_rtol": "1e-08"
+      },
+      "inner_rtol": null,
+      "model": "stokes-scaling",
+      "nprocs": 125,
+      "pc_fallbacks": {
+        "velocity.fell_back_from_fmg": {
+          "detail": "the velocity block is running 'gamg' because no mesh hierarchy was available. Build the base mesh with refinement>=1, or adapt onto a child, to get FMG.",
+          "installed": "gamg",
+          "reason": "unavailable",
+          "requested": "custom-P geometric MG (no explicit choice was made)"
+        }
+      },
+      "petsc_int_type": "int32",
+      "placement": {
+        "n_nodes": 3,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 29
+      },
+      "res": 25,
+      "scaling": "Weak",
+      "sif": "/g/data/m18/software/containers/underworld3/underworld3-v3.2.0-20261104-254152221812.sif",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 6.759248997770108e-12,
+          "snes_fnorm_final": 6.759248990660804e-12,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 6.635633314134289e-12,
+          "snes_fnorm_final": 6.635633306734045e-12,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_ABS"
+        }
+      },
+      "tolerance_effective": 1e-08,
+      "tolerance_requested": 1e-08,
+      "uw_version": "3.2.0"
+    },
+    "27": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-09",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.3e-10",
+        "ksp_atol": "1e-14",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "3",
+        "snes_rtol": "1e-08"
+      },
+      "inner_rtol": null,
+      "model": "stokes-scaling",
+      "nprocs": 27,
+      "pc_fallbacks": {
+        "velocity.fell_back_from_fmg": {
+          "detail": "the velocity block is running 'gamg' because no mesh hierarchy was available. Build the base mesh with refinement>=1, or adapt onto a child, to get FMG.",
+          "installed": "gamg",
+          "reason": "unavailable",
+          "requested": "custom-P geometric MG (no explicit choice was made)"
+        }
+      },
+      "petsc_int_type": "int32",
+      "placement": {
+        "n_nodes": 1,
+        "ranks_per_node_max": 27,
+        "ranks_per_node_min": 27
+      },
+      "res": 15,
+      "scaling": "Weak",
+      "sif": "/g/data/m18/software/containers/underworld3/underworld3-v3.2.0-20261104-254152221812.sif",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.108045737605712e-11,
+          "snes_fnorm_final": 1.108045732316249e-11,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.7789978854949167e-11,
+          "snes_fnorm_final": 1.7789978920824923e-11,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_ABS"
+        }
+      },
+      "tolerance_effective": 1e-08,
+      "tolerance_requested": 1e-08,
+      "uw_version": "3.2.0"
+    },
+    "343": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-09",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.3e-10",
+        "ksp_atol": "1e-14",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "3",
+        "snes_rtol": "1e-08"
+      },
+      "inner_rtol": null,
+      "model": "stokes-scaling",
+      "nprocs": 343,
+      "pc_fallbacks": {
+        "velocity.fell_back_from_fmg": {
+          "detail": "the velocity block is running 'gamg' because no mesh hierarchy was available. Build the base mesh with refinement>=1, or adapt onto a child, to get FMG.",
+          "installed": "gamg",
+          "reason": "unavailable",
+          "requested": "custom-P geometric MG (no explicit choice was made)"
+        }
+      },
+      "petsc_int_type": "int32",
+      "placement": {
+        "n_nodes": 8,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 7
+      },
+      "res": 35,
+      "scaling": "Weak",
+      "sif": "/g/data/m18/software/containers/underworld3/underworld3-v3.2.0-20261104-254152221812.sif",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 6.4143743077171164e-12,
+          "snes_fnorm_final": 6.414374228575556e-12,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 6.375777198836303e-12,
+          "snes_fnorm_final": 6.375777219286134e-12,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_ABS"
+        }
+      },
+      "tolerance_effective": 1e-08,
+      "tolerance_requested": 1e-08,
+      "uw_version": "3.2.0"
+    },
+    "64": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-09",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.3e-10",
+        "ksp_atol": "1e-14",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "3",
+        "snes_rtol": "1e-08"
+      },
+      "inner_rtol": null,
+      "model": "stokes-scaling",
+      "nprocs": 64,
+      "pc_fallbacks": {
+        "velocity.fell_back_from_fmg": {
+          "detail": "the velocity block is running 'gamg' because no mesh hierarchy was available. Build the base mesh with refinement>=1, or adapt onto a child, to get FMG.",
+          "installed": "gamg",
+          "reason": "unavailable",
+          "requested": "custom-P geometric MG (no explicit choice was made)"
+        }
+      },
+      "petsc_int_type": "int32",
+      "placement": {
+        "n_nodes": 2,
+        "ranks_per_node_max": 48,
+        "ranks_per_node_min": 16
+      },
+      "res": 20,
+      "scaling": "Weak",
+      "sif": "/g/data/m18/software/containers/underworld3/underworld3-v3.2.0-20261104-254152221812.sif",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 6.179955082474103e-12,
+          "snes_fnorm_final": 6.179954962987827e-12,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 6.090848339745288e-12,
+          "snes_fnorm_final": 6.090848321215858e-12,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_ABS"
+        }
+      },
+      "tolerance_effective": 1e-08,
+      "tolerance_requested": 1e-08,
+      "uw_version": "3.2.0"
+    },
+    "8": {
+      "effective_options": {
+        "fieldsplit_pressure_ksp_max_it": "200",
+        "fieldsplit_pressure_ksp_rtol": "1e-09",
+        "fieldsplit_velocity_ksp_max_it": "200",
+        "fieldsplit_velocity_ksp_rtol": "3.3e-10",
+        "ksp_atol": "1e-14",
+        "ksp_max_it": "100",
+        "ksp_rtol": null,
+        "snes_ksp_ew": "<set, no value>",
+        "snes_max_it": "3",
+        "snes_rtol": "1e-08"
+      },
+      "inner_rtol": null,
+      "model": "stokes-scaling",
+      "nprocs": 8,
+      "pc_fallbacks": {
+        "velocity.fell_back_from_fmg": {
+          "detail": "the velocity block is running 'gamg' because no mesh hierarchy was available. Build the base mesh with refinement>=1, or adapt onto a child, to get FMG.",
+          "installed": "gamg",
+          "reason": "unavailable",
+          "requested": "custom-P geometric MG (no explicit choice was made)"
+        }
+      },
+      "petsc_int_type": "int32",
+      "placement": {
+        "n_nodes": 1,
+        "ranks_per_node_max": 8,
+        "ranks_per_node_min": 8
+      },
+      "res": 10,
+      "scaling": "Weak",
+      "sif": "/g/data/m18/software/containers/underworld3/underworld3-v3.2.0-20261104-254152221812.sif",
+      "solver_stats": {
+        "first_solve": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.4096561395449244e-11,
+          "snes_fnorm_final": 1.4096561603963613e-11,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_RELATIVE"
+        },
+        "steady_solves": {
+          "ksp_its_outer": 1,
+          "ksp_its_total": 1,
+          "ksp_reason": "CONVERGED_RTOL",
+          "ksp_rnorm_final": 1.3882275790351596e-11,
+          "snes_fnorm_final": 1.3882275742887434e-11,
+          "snes_its": 1,
+          "snes_reason": "CONVERGED_FNORM_ABS"
+        }
+      },
+      "tolerance_effective": 1e-08,
+      "tolerance_requested": 1e-08,
+      "uw_version": "3.2.0"
+    }
+  }
+}

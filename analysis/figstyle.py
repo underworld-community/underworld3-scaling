@@ -36,6 +36,14 @@ STAGE = {
     "error_analysis": "C4",
     "io_write":       "C0",
     "io_read":        "C3",
+    "io_write_native": "C2",
+    "io_read_native":  "C4",
+    "eval_nodal":     "C0",
+    "eval_offnode":   "C1",
+    # swarm-scaling: the first/hot-path slots match first_solve/steady_solves.
+    "swarm_setup":    "C7",
+    "first_advect":   "C3",
+    "advect_steps":   "C0",
 }
 
 # Underscored names kept deliberately: these are the literal PETSc log stage identifiers, so
@@ -50,6 +58,13 @@ STAGE_LABEL = {
     "error_analysis": "error_analysis",
     "io_write":       "io_write (mesh.write_timestep)",
     "io_read":        "io_read (read_timestep — coordinate remap)",
+    "io_write_native": "io_write_native (petsc_reload)",
+    "io_read_native":  "io_read_native (read_checkpoint)",
+    "eval_nodal":     "eval_nodal (own coords)",
+    "eval_offnode":   "eval_offnode (cell interiors)",
+    "swarm_setup":    "swarm_setup (populate)",
+    "first_advect":   "first_advect (incl. JIT)",
+    "advect_steps":   "advect_steps (hot path)",
 }
 
 # Entities that recur across figures, likewise fixed.
@@ -227,10 +242,12 @@ def caption(fig, text):
     fig._uw_caption_lines = wrapped.count("\n") + 1
 
 
-def finish(fig, suptitle, path):
+def finish(fig, suptitle, path, top=0.94):
+    """`top` is the panels' upper bound; lower it when a figure-level legend row sits
+    between the suptitle and the panels (see fig_release)."""
     fig.suptitle(suptitle, fontsize=13)
     # Reserve bottom space per caption line, or the wrapped text overlaps the x-axis labels.
     lines = getattr(fig, "_uw_caption_lines", 1)
-    fig.tight_layout(rect=[0, 0.02 + 0.030 * lines, 1, 0.94])
+    fig.tight_layout(rect=[0, 0.02 + 0.030 * lines, 1, top])
     fig.savefig(path, dpi=150, bbox_inches="tight")
     print(f"saved {path}")

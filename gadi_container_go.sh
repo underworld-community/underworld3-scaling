@@ -86,4 +86,5 @@ mpiexec ${UW_MPI_MAP:-} -n ${NTASKS} singularity exec \
      -uw_idx ${RUN_IDX} \
      -uw_integrator ${UW_VEP_INTEGRATOR} \
      -uw_memprobe ${UW_MEMPROBE} \
-     -uw_re ${UW_NS_RE}"
+     -uw_re ${UW_NS_RE} \
+     -uw_fill ${UW_FILL:-3}"

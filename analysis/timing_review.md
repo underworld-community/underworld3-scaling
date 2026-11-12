@@ -1,7 +1,7 @@
 # UW3 timing: how it works, how to improve it, and what our data says
 
 Analysed 2026-08-25. **All four solvers**, each at its largest completed rank count.
-Figure: `figures/timing_metrics.png`.
+Figure: `investigations/figures/timing_metrics.png`.
 
 | campaign | run | ranks | total |
 |---|---|---|---|

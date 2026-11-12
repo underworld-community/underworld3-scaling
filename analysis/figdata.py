@@ -111,10 +111,16 @@ def _read_run(run_dir):
                 info = json.load(fh)
             break
 
-    return {"stages": stages, "events": dict(events), "info": info}
+    # Rank 0's JIT time summed over stages: the cold-cache signature. See _flag_cold.
+    jit_s = sum(e["time"] for (_, ev), e in events.items() if ev == "getext")
+
+    return {"stages": stages, "events": dict(events), "info": info, "jit_s": jit_s}
 
 
 CACHE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".cache")
+# Bump when _read_run's output changes shape, or a cache written by the old code is
+# silently reused — the key only sees the CSVs' mtimes. 2: jit_s added.
+CACHE_VERSION = "2"
 
 
 def _cache_key(paths):
@@ -124,7 +130,7 @@ def _cache_key(paths):
     cache cannot outlive the data it came from. Cheap because stat() is cheap — reading
     the CSVs is what costs, and a 2197-rank campaign takes minutes.
     """
-    h = hashlib.sha1()
+    h = hashlib.sha1(CACHE_VERSION.encode())
     for p in paths:
         try:
             h.update(f"{p}:{os.path.getmtime(p)}".encode())
@@ -173,6 +179,10 @@ def _load_from_export(campaign):
         for r in rows:
             key = (int(r["nprocs"]), int(r["replicate"]))
             runs[key]["info"] = info.get(r["nprocs"], {})
+            runs[key]["jit_s"] = float(r.get("jit_s") or 0.0)
+            # Rounds exported before the flag existed leave it to _flag_cold.
+            if r.get("cold_jit") not in (None, ""):
+                runs[key]["cold_jit"] = bool(int(r["cold_jit"]))
 
         for name, target in (("stages.csv", "stages"), ("events.csv", "events")):
             with open(os.path.join(root, name)) as fh:
@@ -211,18 +221,21 @@ def _load_from_export(campaign):
     return None
 
 
-def load(campaign_dir, pattern="*_out/*"):
+def load(campaign_dir, pattern="*_out/*", from_raw=False):
     """All runs in a campaign, grouped by rank count and averaged over replicates.
 
-    Returns {nprocs: {...}} with stage times averaged, event counts taken from the first
-    replicate (they are deterministic under a fixed-work protocol), and run_info carried
-    through for placement, checkpoint bytes and solver stats.
+    Returns {nprocs: {...}} with stage times averaged over the WARM replicates (see
+    _flag_cold), event counts taken from the first replicate (they are deterministic under
+    a fixed-work protocol), and run_info carried through for placement, checkpoint bytes
+    and solver stats.
 
     Prefers an exported round under `data/` — that is the archival copy and the only one
     that survives scratch purging. Falls back to parsing the raw campaign directories.
+    `from_raw` forces the raw path: the exporter must read the logs, or re-exporting a
+    round would just copy the stale export it is meant to replace.
     """
     campaign = os.path.relpath(os.path.abspath(campaign_dir), REPO).rstrip("/")
-    from_export = _load_from_export(campaign)
+    from_export = None if from_raw else _load_from_export(campaign)
     if from_export:
         return from_export
 
@@ -254,6 +267,29 @@ def load(campaign_dir, pattern="*_out/*"):
     return out
 
 
+# A cold UW3 JIT cache (new container, or a new binary-compat key) adds seconds of compile
+# time to whichever stage first touches an expression, and the launcher submits replicates
+# together, so several can be cold at once. Detected RELATIVE to the fastest replicate at the
+# same rank count, never by an absolute threshold: v3.1.0 Stokes recompiled on every run
+# (cache=False in SNES_Stokes_SaddlePt._build), so its getext is 2-5 s in every replicate
+# and an absolute cut would flag the whole campaign. Measured: cold replicates exceed warm
+# ones by 2.4-5.2 s and 20x or more; replicate noise on that per-run recompile at 1000 ranks
+# reaches 1.25 s and 1.3x. Both tests must pass.
+COLD_EXCESS_S = 1.0
+COLD_RATIO = 3.0
+
+
+def _flag_cold(reps):
+    """Set rep["cold_jit"] on replicates that lack it (an export carries the flag)."""
+    unflagged = [r for r in reps if "cold_jit" not in r]
+    if not unflagged:
+        return
+    jit_min = min(r.get("jit_s", 0.0) for r in reps)
+    for r in unflagged:
+        j = r.get("jit_s", 0.0)
+        r["cold_jit"] = (j - jit_min > COLD_EXCESS_S) and (j > COLD_RATIO * jit_min)
+
+
 def _aggregate(runs):
     """{nprocs: [run, ...]} -> the public structure. Shared by both load paths.
 
@@ -261,10 +297,18 @@ def _aggregate(runs):
     subtly different numbers.
     """
     out = {}
-    for n, reps in sorted(runs.items()):
+    for n, reps_all in sorted(runs.items()):
+        _flag_cold(reps_all)
+        # Cold replicates are left out of the mean and the spread but kept in reps_all so
+        # the export records them. When every replicate is cold there is nothing better to
+        # show; they are used and n_cold says so.
+        warm = [r for r in reps_all if not r["cold_jit"]]
+        reps = warm or reps_all
         stage_names = set().union(*(set(r["stages"]) for r in reps))
         out[n] = {
             "n_replicates": len(reps),
+            "n_cold": len(reps_all) - len(warm),
+            "reps_all": reps_all,
             "info": reps[0]["info"],
             "events": reps[0]["events"],
             # The raw replicates are kept so error bars can be derived from the same runs
@@ -331,6 +375,17 @@ def event(data, stage, name, field="max"):
     """(ranks, values) for one PETSc event. field: max | min | time."""
     ns = sorted(data)
     return ns, [data[n]["events"].get((stage, name), {}).get(field, 0) for n in ns]
+
+
+def round_info(campaign):
+    """Manifest of the exported round holding `campaign`, or {} if it is only raw."""
+    for runs_csv in _export_rounds():
+        with open(runs_csv) as fh:
+            if not any(r["campaign"] == campaign for r in csv.DictReader(fh)):
+                continue
+        with open(os.path.join(os.path.dirname(runs_csv), "manifest.json")) as fh:
+            return json.load(fh)
+    return {}
 
 
 def ranks_per_node(data):

@@ -70,7 +70,7 @@ def skew_per_point(data):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--outdir", default="figures")
+    ap.add_argument("--outdir", default="investigations/figures")
     args = ap.parse_args()
 
     repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

@@ -1,9 +1,9 @@
 {
   "round": "2026-08_uw3-v3.1.0",
-  "generated": "2026-08-13",
+  "generated": "2026-11-12",
   "uw3_version": "v3.1.0",
   "benchmark_version": 1,
-  "benchmark_note": "poisson analytic init + zero_init_guess=False; checkpoint has no Stokes solve, adds eval stages; advdiff nsteps split from maxits; stokes simplified body force + Dirichlet BCs",
+  "benchmark_note": "poisson analytic init + zero_init_guess=False; checkpoint has no Stokes solve, adds eval stages; advdiff nsteps split from maxits; stokes simplified body force + Dirichlet BCs; evalbarrier and h5mesh campaigns are benchmark v2 (timed barriers, .msh.h5 read) on the same container",
   "sites": {
     "gadi": {
       "petsc_version": "3.25.0",
@@ -18,6 +18,8 @@
     "weak-scaling-2026-advdiff-meshindep",
     "weak-scaling-2026-checkpoint",
     "weak-scaling-2026-checkpoint-evalfix",
+    "weak-scaling-2026-evalbarrier",
+    "weak-scaling-2026-h5mesh",
     "weak-scaling-2026-poisson-analytic",
     "weak-scaling-2026-stokes-BASE10",
     "weak-scaling-2026-stokes-BASE10-spread",
@@ -29,6 +31,7 @@
     "weak-scaling-2026-stokes-BASE5-innerscan/1e-6"
   ],
   "missing_campaigns": [],
-  "n_runs": 150,
+  "n_runs": 177,
+  "n_cold_jit_runs": 0,
   "raw_output_note": "Raw PETSc logs (5.8 GB, one 423 MB file at 2197 ranks) lived under /scratch/el06/jg0883 on Gadi and are subject to scratch purging. This reduction is the archival copy: it holds every number the figures use."
 }

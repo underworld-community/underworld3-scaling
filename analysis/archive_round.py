@@ -5,15 +5,19 @@ calendar period. Campaigns run against the same environment append to the open r
 round closes when the environment changes, because that is what makes older numbers
 incomparable rather than merely older.
 
-Freezing moves three things into a single self-contained directory:
+What is frozen is the INVESTIGATIONS page, not the front page. The front page
+(README.md, figures/release_*.png) is a rolling release-over-release summary that reads
+every round under data/ and is never archived. Freezing moves three things into a single
+self-contained directory:
 
-    reports/<round>/report.md    the README exactly as it stood
-    reports/<round>/figures/     the figures it refers to
+    reports/<round>/report.md    investigations/README.md exactly as it stood
+    reports/<round>/figures/     investigations/figures/, the figures it refers to
     reports/<round>/data/        the reduced dataset they were built from
 
 NOTHING IS DELETED. The dataset is MOVED rather than copied, so there is one authoritative
-copy instead of two that can drift; git records it as a rename. Afterwards the top-level
-README.md, figures/ and data/ belong to the new round alone.
+copy instead of two that can drift; git records it as a rename. Afterwards
+investigations/ and data/ belong to the new round alone. The front page keeps reading the
+moved round: figdata searches reports/*/data/ as well as data/.
 
 The point of keeping data/ beside the report is that an archived figure stays regenerable
 years later with no Gadi access and no raw logs — `figdata` searches archived rounds too.
@@ -46,8 +50,8 @@ def main():
     repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     dest = os.path.join(repo, "reports", args.round)
     data_src = os.path.join(repo, "data", args.round)
-    readme = os.path.join(repo, "README.md")
-    figures = os.path.join(repo, "figures")
+    readme = os.path.join(repo, "investigations", "README.md")
+    figures = os.path.join(repo, "investigations", "figures")
 
     # Refuse rather than clobber: a frozen round is the record of what was published, and
     # silently overwriting one destroys the only copy of a superseded result.
@@ -82,8 +86,8 @@ def main():
         f"<!-- FROZEN ROUND — do not edit -->\n"
         f"> **Archived round `{args.round}`**, frozen {datetime.date.today().isoformat()}.\n"
         f"> These results describe one environment and are not updated. The current round is\n"
-        f"> in the repository README. Figures here regenerate from `data/` in this same\n"
-        f"> directory.\n\n"
+        f"> in investigations/README.md; the release-over-release summary is the repository\n"
+        f"> README. Figures here regenerate from `data/` in this same directory.\n\n"
     )
     with open(os.path.join(dest, "report.md"), "w") as fh:
         fh.write(banner + body)
@@ -102,7 +106,7 @@ def main():
         shutil.move(data_src, data_dest)
 
     print(f"frozen round -> {os.path.relpath(dest, repo)}")
-    print(f"  report.md   (from README.md)")
+    print(f"  report.md   (from investigations/README.md)")
     print(f"  figures/    {len(pngs)} files")
     print(f"  data/       {'copied' if args.keep_data else 'moved'} from "
           f"{os.path.relpath(data_src, repo)}")
@@ -110,7 +114,8 @@ def main():
     print("Next, for the new round:")
     print("  1. run the new campaigns and download them")
     print("  2. python3 analysis/export_data.py --round <new-label> --uw3-version ...")
-    print("  3. regenerate figures, rewrite README.md")
+    print("  3. regenerate figures, rewrite investigations/README.md; the front page")
+    print("     (README.md, analysis/fig_release.py) only needs the new round pair")
     print("  4. record in CHANGELOG.md anything the new round OVERTURNS, not just adds")
 
 

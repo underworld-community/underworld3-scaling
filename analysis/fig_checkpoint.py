@@ -48,7 +48,7 @@ LABEL = {"io_write": "io_write (mesh.write_timestep)",
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--outdir", default="figures")
+    ap.add_argument("--outdir", default="investigations/figures")
     ap.add_argument("--campaign", default=CAMPAIGN)
     args = ap.parse_args()
 

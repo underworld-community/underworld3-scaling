@@ -56,6 +56,10 @@ MESH_SPECS = {
         "type": "box",
         "qdeg": 2,
     },
+    "swarm-scaling": {
+        "type": "box",
+        "qdeg": 2,
+    },
     "stokes-scaling": {
         "type": "spherical",
         "qdeg": 2,

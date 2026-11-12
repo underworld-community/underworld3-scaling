@@ -85,6 +85,11 @@ export UW_MEMPROBE=0
 # NavierStokes Reynolds number (ns-scaling.py).
 export UW_NS_RE=100
 
+# swarm-scaling: particles per dimension per cell (populate's fill_param). 3 is a dense
+# PIC swarm (20 particles per tetrahedron); the particle count per rank is then fixed by
+# BASE, so this is the weak-scaling work-per-rank knob for that model.
+export UW_FILL=3
+
 # unused / legacy
 export UW_PENALTY=-1.               # set to negative value to disable penalty
 export UW_ENABLE_IO="0"
