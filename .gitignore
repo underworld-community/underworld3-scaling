@@ -11,3 +11,8 @@ __pycache__/
 *.pyc
 .claude/
 .DS_Store
+
+# Gadi clone only: the launcher submits with -l wd, so PBS writes job logs (*.o<id>) and
+# the per-campaign log folders (Weak_*/) into the checkout. Output itself goes to OUTPUT_BASE.
+Weak_*/
+*.o[0-9]*

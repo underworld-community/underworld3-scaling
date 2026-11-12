@@ -24,8 +24,8 @@ module load singularity
 # One line per mesh family this round, "model:base:jobs" — independent of params.sh,
 # whose BASE only describes the box models.
 MESH_SETS=(
-    "poisson-scaling:24:1 2 4"
-    "stokes-scaling:5:1 2 4"
+    "poisson-scaling:24:1 2 3 4 5 7"
+    "stokes-scaling:5:1 2 3 4 5 7"
 )
 
 echo "=== Mesh pre-generation ==="
