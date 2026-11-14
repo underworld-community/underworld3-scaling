@@ -25,6 +25,12 @@ from matplotlib import ticker
 # Matplotlib's default tab10 cycle. Slots are fixed so the entity mappings below stay stable.
 PALETTE = [f"C{i}" for i in range(10)]
 
+# Sizes the rc file does not cover. The front page (fig_front) shrinks them for A4-width
+# figures; the investigation figures keep these.
+MARKERSIZE = 5
+LEGEND_FONTSIZE = 9
+MINOR_TICK_FONTSIZE = 8
+
 # PETSc log stages appear in every campaign, so they get a fixed mapping — mesh_setup is the
 # same colour whether you are looking at Poisson or checkpoint I/O.
 STAGE = {
@@ -113,14 +119,14 @@ def line(ax, xs, ys, colour, label, dashed=False, marker="o", lo=None, hi=None):
     see at a glance which parts of a sweep were repeated and which rest on a single run.
     """
     if lo is None or hi is None:
-        ax.plot(xs, ys, color=colour, marker=marker, markersize=5,
+        ax.plot(xs, ys, color=colour, marker=marker, markersize=MARKERSIZE,
                 linestyle="--" if dashed else "-", label=label)
         return
     # Clamped because the mean of the replicates can land a float epsilon outside the
     # observed range, and matplotlib rejects a negative yerr outright.
     yerr = [[max(0.0, y - l) for y, l in zip(ys, lo)],
             [max(0.0, h - y) for y, h in zip(ys, hi)]]
-    ax.errorbar(xs, ys, yerr=yerr, color=colour, marker=marker, markersize=5,
+    ax.errorbar(xs, ys, yerr=yerr, color=colour, marker=marker, markersize=MARKERSIZE,
                 linestyle="--" if dashed else "-", label=label,
                 capsize=3, elinewidth=1, capthick=1)
 
@@ -149,13 +155,13 @@ def style(ax, ylabel, title, xs=None, logy=False, legend_loc="best", legend=True
             ax.yaxis.set_minor_locator(ticker.LogLocator(base=10, subs=(2, 3, 5)))
             ax.yaxis.set_minor_formatter(plain)
             ax.yaxis.set_major_formatter(plain)
-            ax.tick_params(axis="y", which="minor", labelsize=8)
+            ax.tick_params(axis="y", which="minor", labelsize=MINOR_TICK_FONTSIZE)
     ax.grid(True, alpha=0.3)
     ax.set_axisbelow(True)
     # A single series needs no legend — the title names it. Two or more always get one, so
     # identity is never carried by colour alone.
     if legend and len(ax.get_legend_handles_labels()[0]) > 1:
-        ax.legend(loc=legend_loc, fontsize=9)
+        ax.legend(loc=legend_loc, fontsize=LEGEND_FONTSIZE)
 
 
 def ideal_line(ax, ymax=None, logy=False):
@@ -242,13 +248,30 @@ def caption(fig, text):
     fig._uw_caption_lines = wrapped.count("\n") + 1
 
 
-def finish(fig, suptitle, path, top=0.94):
+def finish(fig, suptitle, path, top=0.94, title_pad=None, title_size=13, dpi=150,
+           crop=True, right=1.0):
     """`top` is the panels' upper bound; lower it when a figure-level legend row sits
-    between the suptitle and the panels (see fig_release)."""
-    fig.suptitle(suptitle, fontsize=13)
+    between the suptitle and the panels (see fig_release).
+
+    With `title_pad` (figure fraction) the suptitle is placed AFTER the layout, that far
+    above the tallest panel title, instead of at matplotlib's default near the figure
+    edge: tight_layout otherwise opens a band between the two titles that grows as the
+    figure shrinks; the title is then centred over the panels, i.e. over [0, `right`],
+    which is less than the figure when a legend column sits to the right of them.
+    `crop=False` saves the figure at exactly its figsize: the front page is laid out to a
+    page width, which a tight bounding box would trim."""
     # Reserve bottom space per caption line, or the wrapped text overlaps the x-axis labels.
     # A figure without a caption gets none.
     lines = getattr(fig, "_uw_caption_lines", 0)
-    fig.tight_layout(rect=[0, 0.02 + 0.030 * lines, 1, top])
-    fig.savefig(path, dpi=150, bbox_inches="tight")
+    if title_pad is None:
+        fig.suptitle(suptitle, fontsize=title_size)
+        fig.tight_layout(rect=[0, 0.02 + 0.030 * lines, 1, top])
+    else:
+        fig.tight_layout(rect=[0, 0.02 + 0.030 * lines, right, top])
+        renderer = fig.canvas.get_renderer()
+        tops = [ax.title.get_window_extent(renderer).y1 for ax in fig.axes]
+        y = fig.transFigure.inverted().transform((0, max(tops)))[1]
+        fig.suptitle(suptitle, fontsize=title_size, x=right / 2, y=y + title_pad,
+                     va="bottom")
+    fig.savefig(path, dpi=dpi, bbox_inches="tight" if crop else None)
     print(f"saved {path}")

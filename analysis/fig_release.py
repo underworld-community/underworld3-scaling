@@ -1,4 +1,4 @@
-"""Release over release — the front-page figure, one per model.
+"""Release over release — the comparison figures, one per model.
 
 What this figure has to answer: did the release change how the code scales? Three stages
 (mesh_setup, first_solve, steady_solves); the current release solid, the previous dashed in
@@ -9,17 +9,15 @@ sub-pixel, smaller than the marker.
 Efficiency is T(first point)/T(N) for both releases. The packed-node baseline the
 investigations page insists on cancels here: both releases ran the same placement, so the
 ratio is immune to it and the efficiency panel compares like with like. Stokes starts at 8
-ranks (see PAIRS). The previous sweep may extend further
-than the current one (v3.1.0 ran to 2197 ranks, the v3.2.0 check to 343): cost and
-efficiency show every point each release has, the ratio only the ranks both have.
+ranks (see PAIRS). The previous sweep may extend further than the current one (v3.1.0 ran
+to 2197 ranks): cost and efficiency show every point each release has, the ratio only the
+ranks both have.
 
-Two outputs per model. `<model>.png` is the front page: this release alone, cost and
-efficiency, two panels so it reads large. `release_<model>.png` is the comparison page:
-the previous release dashed and a third panel with the ratio current/previous per stage,
-the only form in which a 10% change is readable (on the log cost axis it is sub-pixel).
-Prints the per-stage tables for both pages.
+Output: `release_<model>.png` per model with a previous round, plus the per-stage tables
+and a markdown delta table. The front page (this release alone, one figure per question)
+is fig_front.py, which imports PAIRS and the panel code from here.
 
-Usage:  python analysis/fig_release.py [--mode current|compare|both] [--models ...]
+Usage:  python analysis/fig_release.py [--models ...]
 """
 
 import argparse
@@ -65,7 +63,8 @@ PAIRS = {
                              "rotation, semi-Lagrangian characteristics with nodal projection "
                              "(SLCN), degree-2 elements, Dirichlet walls, BASE=24 box; 10 "
                              "timesteps at CFL 0.5, fixed work")),
-    # legend_loc / legend_panel pin the front-page legend where "best" collides: four long
+    # legend_loc / legend_panel (read by fig_front) pin the front-page legend where "best"
+    # collides: four long
     # I/O labels only fit in the cost panel's upper left, above curves still near the floor.
     "checkpoint": dict(prev="weak-scaling-2026-evalbarrier", curr="weak-scaling-2026-11-checkpoint",
                        start=1, stages=["io_write", "io_read", "io_write_native", "io_read_native"],
@@ -186,9 +185,9 @@ def cost_and_efficiency(ax, curr, prev, stages, start, labels=None, legend_loc=N
                         legend_panel="efficiency"):
     """The two panels every figure has: current release solid, previous (if any) dashed.
 
-    With `legend_loc` one panel carries the legend (the front-page figure: one release, few
-    entries); without it the caller draws a figure-level legend (the comparison figure,
-    where six entries would cover the low-rank points). `legend_panel` picks which panel:
+    With `legend_loc` one panel carries the legend (the front-page figures in fig_front: one
+    release, few entries); without it the caller draws a figure-level legend (the comparison
+    figure, where six entries would cover the low-rank points). `legend_panel` picks which panel:
     the efficiency panel's lower left is usually empty, but four long I/O labels only fit
     in the cost panel's upper left, where every curve is still near the floor.
     """
@@ -214,33 +213,6 @@ def cost_and_efficiency(ax, curr, prev, stages, start, labels=None, legend_loc=N
         # The ideal line lives in the other panel, so it joins this legend as a proxy.
         handles, _ = ax[0].get_legend_handles_labels()
         ax[0].legend(handles=handles + [_ideal_proxy()], loc=legend_loc, fontsize=9)
-
-
-def draw_current(model, pair, curr, cv, outdir):
-    """The front-page figure: this release alone, two panels, legend inside the efficiency
-    panel and no caption in the image — the README carries the caption text, printed below
-    so it can be regenerated with the figure."""
-    stages = pair["stages"]
-    fig, ax = fs.new_figure(2)
-    cost_and_efficiency(ax, curr, {}, stages, pair["start"], labels=fs.STAGE_LABEL,
-                        legend_loc=pair.get("legend_loc", "best"),
-                        legend_panel=pair.get("legend_panel", "efficiency"))
-    out = os.path.join(outdir, f"{model}.png")
-    # No legend row and no caption, so the panels can reach up to the title.
-    fs.finish(fig, f"Underworld3 {TITLE[model]} — weak scaling, {cv}", out, top=0.965)
-    print(f"CAPTION {model}: {pair['caption']}. {cv}, {reps_text(curr)} replicates per "
-          f"point; bars span the replicate min-max range.{exclusion_notes(curr)}")
-
-    ns = sorted(curr)
-    print(f"\n{TITLE[model]} ({cv}): wall time s / efficiency T({pair['start']})/T(N)")
-    print(f"{'ranks':>6}" + "".join(f"{s[:14]:>22}" for s in stages))
-    for n in ns:
-        cells = []
-        for s in stages:
-            ys = [curr[m]["stages"][s]["time"] for m in ns if s in curr[m]["stages"]]
-            t = curr[n]["stages"].get(s, {}).get("time")
-            cells.append(f"{t:>12.1f} / {ys[0] / t:5.2f}" if t else f"{'':>20}")
-        print(f"{n:>6}" + "".join(f"{c:>22}" for c in cells))
 
 
 def draw_compare(model, pair, prev, curr, pv, cv, outdir, md):
@@ -290,9 +262,6 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--outdir", default="figures")
     ap.add_argument("--models", nargs="+", default=list(PAIRS), choices=list(PAIRS))
-    ap.add_argument("--mode", default="both", choices=["current", "compare", "both"],
-                    help="current: <model>.png, this release only (front page); compare: "
-                         "release_<model>.png against the previous round")
     args = ap.parse_args()
 
     repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -309,15 +278,12 @@ def main():
             continue
         curr = {n: v for n, v in curr.items() if n >= start}
         cv = version(pair["curr"])
-        if args.mode in ("current", "both"):
-            draw_current(model, pair, curr, cv, outdir)
-        if args.mode in ("compare", "both"):
-            prev = figdata.load(os.path.join(repo, pair["prev"])) if pair["prev"] else {}
-            prev = {n: v for n, v in prev.items() if n >= start}
-            if prev:
-                draw_compare(model, pair, prev, curr, version(pair["prev"]), cv, outdir, md)
-            else:
-                print(f"{TITLE[model]}: no previous round to compare against")
+        prev = figdata.load(os.path.join(repo, pair["prev"])) if pair["prev"] else {}
+        prev = {n: v for n, v in prev.items() if n >= start}
+        if prev:
+            draw_compare(model, pair, prev, curr, version(pair["prev"]), cv, outdir, md)
+        else:
+            print(f"{TITLE[model]}: no previous round to compare against")
 
     if md:
         ranks = sorted({n for _, _, ns, _ in md for n in ns})

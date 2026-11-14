@@ -6,8 +6,9 @@ round closes when the environment changes, because that is what makes older numb
 incomparable rather than merely older.
 
 What is frozen is the INVESTIGATIONS page, not the front page. The front page
-(README.md, figures/release_*.png) is a rolling release-over-release summary that reads
-every round under data/ and is never archived. Freezing moves three things into a single
+(README.md, figures/, from fig_front.py and fig_release.py) always shows the current
+release and its comparison with the previous one, reads every round under data/, and is
+never archived. Freezing moves three things into a single
 self-contained directory:
 
     reports/<round>/report.md    investigations/README.md exactly as it stood
@@ -115,7 +116,7 @@ def main():
     print("  1. run the new campaigns and download them")
     print("  2. python3 analysis/export_data.py --round <new-label> --uw3-version ...")
     print("  3. regenerate figures, rewrite investigations/README.md; the front page")
-    print("     (README.md, analysis/fig_release.py) only needs the new round pair")
+    print("     (README.md, analysis/fig_front.py, fig_release.py) only needs the new round pair")
     print("  4. record in CHANGELOG.md anything the new round OVERTURNS, not just adds")
 
 
